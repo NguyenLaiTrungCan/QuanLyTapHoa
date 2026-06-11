@@ -1,5 +1,6 @@
 *.log
 .DS_Store
+Ke_hoach_Du_an_Quan_ly_Tap_hoa_Laravel.md
 .env
 .env.backup
 .env.production
