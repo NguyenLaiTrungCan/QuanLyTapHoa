@@ -22,6 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
+        'address',
+        'is_admin',
     ];
 
     /**
@@ -44,6 +47,24 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
         ];
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
+    }
+    public function isAdmin()
+    {
+        return $this->is_admin === true || $this->is_admin === 1;
+    }
+    public function getPendingOrdersCount()
+    {
+        return $this->orders()->where('status', '!=', 'delivered')->count();
     }
 }
