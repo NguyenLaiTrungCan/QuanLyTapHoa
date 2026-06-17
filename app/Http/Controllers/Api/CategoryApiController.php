@@ -15,9 +15,9 @@ class CategoryApiController extends Controller
         $categories = Category::withCount('products')
             ->latest()
             ->get();
-
+        
         return response()->json([
-            'data' => $categories,
+            'data' => $categories
         ]);
     }
 
@@ -26,7 +26,7 @@ class CategoryApiController extends Controller
         $category->loadCount('products');
 
         return response()->json([
-            'data' => $category,
+            'data' => $category
         ]);
     }
 
@@ -36,7 +36,7 @@ class CategoryApiController extends Controller
 
         return response()->json([
             'message' => 'Đã tạo danh mục thành công.',
-            'data' => $category,
+            'data' => $category->loadCount('products'),
         ], 201);
     }
 
@@ -53,9 +53,10 @@ class CategoryApiController extends Controller
     public function destroy(Category $category): JsonResponse
     {
         if ($category->products()->exists()) {
+            // Trả về lỗi 422 để frontend hiển thị thông báo "Vàng/Cảnh báo"
             return response()->json([
                 'message' => 'Không thể xóa danh mục đang có sản phẩm.',
-            ], 422);
+            ], 422); 
         }
 
         $category->delete();

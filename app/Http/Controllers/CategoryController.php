@@ -46,7 +46,18 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        return redirect()->route('categories.index');
+        // Tối ưu: Eager load để tránh N+1 query khi hiển thị danh sách sản phẩm
+        $products = $category->products()->latest()->paginate(12);
+        
+        // Chỉ lấy các trường cần thiết cho Sidebar và có thể cache tại đây nếu cần
+        $categories = Category::orderBy('name')->get(['id', 'name']); 
+        
+        // Kiểm tra nếu view của Người 1 tồn tại thì mới gọi, không thì quay về index
+        if (view()->exists('products.index')) {
+            return view('products.index', compact('products', 'category', 'categories'));
+        }
+
+        return redirect()->route('categories.index')->with('warning', 'Trang danh sách sản phẩm đang được xây dựng.');
     }
 
     /**
@@ -66,7 +77,7 @@ class CategoryController extends Controller
 
         return redirect()
             ->route('categories.index')
-            ->with('success', 'Đã cập nhật danh mục thành công.');
+            ->with('success', "Danh mục '{$category->name}' đã được cập nhật.");
     }
 
     /**
@@ -75,7 +86,7 @@ class CategoryController extends Controller
     public function destroy(Category $category): RedirectResponse
     {
         if ($category->products()->exists()) {
-            return back()->with('error', 'Không thể xóa danh mục đang có sản phẩm.');
+            return back()->with('warning', 'Không thể xóa danh mục đang có sản phẩm.');
         }
 
         $category->delete();

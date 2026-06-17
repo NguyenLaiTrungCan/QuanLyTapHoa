@@ -50,8 +50,7 @@
         }
 
         .navbar .nav-link,
-        .navbar .navbar-brand,
-        .navbar .btn {
+        .navbar .navbar-brand {
             color: #fff !important;
         }
 

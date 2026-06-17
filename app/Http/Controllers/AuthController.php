@@ -41,7 +41,7 @@ class AuthController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
 
             return redirect()
@@ -50,9 +50,10 @@ class AuthController extends Controller
         }
 
         return back()
+            ->with('warning', 'Email hoặc mật khẩu không đúng, vui lòng kiểm tra lại.') 
             ->withErrors([
                 'email' => 'Thông tin đăng nhập không chính xác.',
-            ])
+            ]) // CSS class sẽ map với màu Vàng của UIUX
             ->onlyInput('email');
     }
 
@@ -84,8 +85,7 @@ class AuthController extends Controller
 
     public function updateProfile(UpdateProfileRequest $request): RedirectResponse
     {
-        $user = $request->user();
-        $user->update($request->validated());
+        $request->user()->update($request->validated());
 
         return redirect()
             ->route('profile')
