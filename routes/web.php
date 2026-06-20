@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
@@ -21,6 +23,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [AuthController::class, 'editProfile'])->name('profile.edit');
     Route::put('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
     Route::put('/profile/password', [AuthController::class, 'changePassword'])->name('profile.password');
+
+    // Admin Dashboard
+    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+
+    // Orders
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [OrderController::class, 'index'])->name('index');
+        Route::get('/{order}', [OrderController::class, 'show'])->name('show');
+    });
 
     Route::prefix('admin/categories')->name('categories.')->group(function () {
         Route::get('/', [CategoryController::class, 'index'])->name('index');
