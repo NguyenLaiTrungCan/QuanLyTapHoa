@@ -3,63 +3,77 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inventory;
-use Illuminate\Http\Request;
+use App\Http\Requests\InventoryRequest;
+use Illuminate\Http\JsonResponse;
 
 class InventoryController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Get inventory list with low stock alert check
+     * GET /api/inventory
      */
     public function index()
     {
-        //
+        $inventories = Inventory::with('product')->get();
+
+        return view('inventory.index', compact('inventories'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Get specific inventory details
+     * GET /api/inventory/{id}
      */
-    public function create()
+    public function show(int $id)
     {
-        //
+        $inventory = Inventory::with('product')->findOrFail($id);
+        return view('inventory.edit', compact('inventory'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Update stock quantity
+     * PUT /api/inventory/{id}
      */
-    public function store(Request $request)
+    public function update(InventoryRequest $request, int $id)
     {
-        //
+        $inventory = Inventory::findOrFail($id);
+        
+        $inventory->update([
+            'quantity' => $request->quantity,
+            'location' => $request->location ?? $inventory->location
+        ]);
+
+        return redirect('/inventory')->with('success', 'Đã cập nhật số lượng tồn kho thành công!');
     }
 
     /**
-     * Display the specified resource.
+     * Decrease stock (Called by CheckoutController after successful order)
+     * @param int $productId
+     * @param int $quantity
+     * @return bool
      */
-    public function show(Inventory $inventory)
+    public function decreaseStock(int $productId, int $quantity): bool
     {
-        //
+        $inventory = Inventory::where('product_id', $productId)->first();
+        
+        if ($inventory && $inventory->quantity >= $quantity) {
+            $inventory->decrement('quantity', $quantity);
+            return true;
+        }
+        
+        return false;
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Increase stock (Called if order is cancelled/returned)
+     * @param int $productId
+     * @param int $quantity
+     * @return void
      */
-    public function edit(Inventory $inventory)
+    public function increaseStock(int $productId, int $quantity): void
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Inventory $inventory)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Inventory $inventory)
-    {
-        //
+        $inventory = Inventory::where('product_id', $productId)->first();
+        if ($inventory) {
+            $inventory->increment('quantity', $quantity);
+        }
     }
 }
