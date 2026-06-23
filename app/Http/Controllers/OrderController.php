@@ -3,63 +3,171 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Inventory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of orders.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $user = $request->user();
+
+        if (!$user) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Chưa đăng nhập.'], 401);
+            }
+            return redirect()->route('login');
+        }
+
+        if ($user->isAdmin()) {
+            $orders = Order::with('user')->latest()->get();
+        } else {
+            $orders = Order::where('user_id', $user->id)->latest()->get();
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['orders' => $orders]);
+        }
+
+        return view('orders.index', compact('orders'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display the specified order details.
      */
-    public function create()
+    public function show(Request $request, Order $order)
     {
-        //
+        $user = $request->user();
+
+        if (!$user) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Chưa đăng nhập.'], 401);
+            }
+            return redirect()->route('login');
+        }
+
+        // Security Check: Customer cannot view other customers' orders
+        if (!$user->isAdmin() && $order->user_id !== $user->id) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Bạn không có quyền xem đơn hàng này.'], 403);
+            }
+            abort(403, 'Bạn không có quyền xem đơn hàng này.');
+        }
+
+        $order->load(['user', 'orderItems.product']);
+
+        if ($request->expectsJson()) {
+            return response()->json(['order' => $order]);
+        }
+
+        return view('orders.show', compact('order'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Cancel a pending order.
      */
-    public function store(Request $request)
+    public function cancel(Request $request, Order $order)
     {
-        //
+        $user = $request->user();
+
+        if (!$user) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Chưa đăng nhập.'], 401);
+            }
+            return redirect()->route('login');
+        }
+
+        // Security Check: Only owner or admin can cancel
+        if (!$user->isAdmin() && $order->user_id !== $user->id) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Bạn không có quyền hủy đơn hàng này.'], 403);
+            }
+            abort(403, 'Bạn không có quyền hủy đơn hàng này.');
+        }
+
+        if (!$order->canBeCancelled()) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Chỉ có thể hủy đơn hàng ở trạng thái Chờ xử lý.'], 400);
+            }
+            return back()->with('error', 'Chỉ có thể hủy đơn hàng ở trạng thái Chờ xử lý.');
+        }
+
+        $cancelled = $order->cancel();
+
+        if ($cancelled) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Hủy đơn hàng thành công.', 'order' => $order->fresh()]);
+            }
+            return back()->with('success', 'Đơn hàng đã được hủy thành công.');
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Không thể hủy đơn hàng lúc này.'], 400);
+        }
+        return back()->with('error', 'Không thể hủy đơn hàng lúc này.');
     }
 
     /**
-     * Display the specified resource.
+     * Update order status (Admin only).
      */
-    public function show(Order $order)
+    public function updateStatus(Request $request, Order $order)
     {
-        //
-    }
+        $user = $request->user();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Order $order)
-    {
-        //
-    }
+        if (!$user || !$user->isAdmin()) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Không có quyền truy cập.'], 403);
+            }
+            abort(403);
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Order $order)
-    {
-        //
-    }
+        $request->validate([
+            'status' => 'required|string|in:pending,processing,shipped,delivered,canceled',
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Order $order)
-    {
-        //
+        $newStatus = $request->input('status');
+        $oldStatus = $order->status;
+
+        // Validation logic for status workflow transitions:
+        // Cannot change if already delivered or cancelled
+        if (in_array($oldStatus, ['delivered', 'canceled'])) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Không thể thay đổi trạng thái của đơn hàng đã giao hoặc đã hủy.'], 400);
+            }
+            return back()->with('error', 'Không thể thay đổi trạng thái của đơn hàng đã giao hoặc đã hủy.');
+        }
+
+        if ($newStatus === 'canceled') {
+            // Admin cancels the order - use the model cancel method to revert stock
+            $cancelled = $order->cancel();
+            if (!$cancelled) {
+                if ($request->expectsJson()) {
+                    return response()->json(['message' => 'Không thể hủy đơn hàng lúc này.'], 400);
+                }
+                return back()->with('error', 'Không thể hủy đơn hàng lúc này.');
+            }
+        } else {
+            // Check workflow order: pending -> processing -> shipped -> delivered
+            // We restrict backward transition to pending from processing/shipped/delivered
+            if ($newStatus === 'pending' && $oldStatus !== 'pending') {
+                if ($request->expectsJson()) {
+                    return response()->json(['message' => 'Không thể chuyển trạng thái đơn hàng quay lại Chờ xử lý.'], 400);
+                }
+                return back()->with('error', 'Không thể chuyển trạng thái đơn hàng quay lại Chờ xử lý.');
+            }
+
+            $order->update(['status' => $newStatus]);
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Cập nhật trạng thái đơn hàng thành công.', 'order' => $order->fresh()]);
+        }
+
+        return back()->with('success', 'Trạng thái đơn hàng đã được cập nhật thành công.');
     }
 }

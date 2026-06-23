@@ -56,10 +56,10 @@ class Order extends Model
 
     public function cancel() 
     {
-        if ($this->canBeCancelled()) {
+        if (!$this->canBeCancelled()) {
             return false;
         }
-        DB::transaction(function () {
+        return DB::transaction(function () {
             foreach ($this->orderItems as $item) {
                 $inventory = Inventory::where('product_id', $item->product_id)->first();
                 if ($inventory) {
@@ -67,7 +67,8 @@ class Order extends Model
                 }
             }
 
-            $this->update(['status' => 'cancelled']);
+            $this->update(['status' => 'canceled']);
+            return true;
         });
     }
 
