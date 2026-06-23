@@ -4,7 +4,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 use Illuminate\Support\Facades\Route;
+
 
 Route::view('/', 'welcome')->name('home');
 
@@ -25,12 +29,14 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/password', [AuthController::class, 'changePassword'])->name('profile.password');
 
     // Admin Dashboard
-    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->middleware('admin')->name('dashboard.index');
 
     // Orders
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('index');
         Route::get('/{order}', [OrderController::class, 'show'])->name('show');
+        Route::post('/{order}/cancel', [OrderController::class, 'cancel'])->name('cancel');
+        Route::put('/{order}/status', [OrderController::class, 'updateStatus'])->middleware('admin')->name('updateStatus');
     });
 
     Route::prefix('admin/categories')->name('categories.')->group(function () {
@@ -41,4 +47,40 @@ Route::middleware('auth')->group(function () {
         Route::put('/{category}', [CategoryController::class, 'update'])->name('update');
         Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
     });
+});
+
+
+Route::middleware(['auth'])->group(function () {
+   Route::prefix('inventory')->group(function () {
+        // Hiển thị danh sách kho (GET /inventory)
+        Route::get('/', [InventoryController::class, 'index']);
+        
+        // Hiển thị form cập nhật kho (GET /inventory/{id}/edit)
+        Route::get('/{id}/edit', [InventoryController::class, 'edit']);
+        
+        // Xử lý lưu dữ liệu cập nhật kho (PUT /inventory/{id})
+        Route::put('/{id}', [InventoryController::class, 'update']);
+    });
+
+    Route::prefix('cart')->group(function () {
+        // Xem giỏ hàng (GET /cart)
+        Route::get('/', [CartController::class, 'index']);
+        
+        // Thêm sản phẩm vào giỏ (POST /cart/add)
+        Route::post('/add', [CartController::class, 'add']);
+        
+        // Cập nhật số lượng sản phẩm (PUT /cart/update/{id})
+        Route::put('/update/{id}', [CartController::class, 'update']);
+        
+        // Xóa một sản phẩm khỏi giỏ (DELETE /cart/remove/{id})
+        Route::delete('/remove/{id}', [CartController::class, 'remove']);
+        
+        // Xóa toàn bộ giỏ hàng (DELETE /cart/clear)
+        Route::delete('/clear', [CartController::class, 'clear']);
+    });
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 });
