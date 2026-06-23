@@ -170,7 +170,7 @@ function initOrderStatusChart() {
         'processing': 'Đang Xử Lý',
         'shipped': 'Đang Giao', // translated from shipped/shipping
         'delivered': 'Đã Giao',
-        'cancelled': 'Đã Hủy'
+        'canceled': 'Đã Hủy'
     };
 
     const statusColors = {
@@ -178,7 +178,7 @@ function initOrderStatusChart() {
         'processing': '#2563EB',   // Primary Blue
         'shipped': '#0ea5e9',      // Info Sky Blue
         'delivered': '#10B981',    // Success Emerald
-        'cancelled': '#EF4444'     // Danger Red
+        'canceled': '#EF4444'      // Danger Red
     };
 
     new Chart(statusCtx, {

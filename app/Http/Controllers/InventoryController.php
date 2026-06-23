@@ -26,12 +26,22 @@ class InventoryController extends Controller
     public function show(int $id)
     {
         $inventory = Inventory::with('product')->findOrFail($id);
+        return response()->json($inventory);
+    }
+
+    /**
+     * Show the form for editing the inventory item
+     * GET /admin/inventory/{id}/edit
+     */
+    public function edit(int $id)
+    {
+        $inventory = Inventory::with('product')->findOrFail($id);
         return view('inventory.edit', compact('inventory'));
     }
 
     /**
      * Update stock quantity
-     * PUT /api/inventory/{id}
+     * PUT /admin/inventory/{id}
      */
     public function update(InventoryRequest $request, int $id)
     {
@@ -42,7 +52,7 @@ class InventoryController extends Controller
             'location' => $request->location ?? $inventory->location
         ]);
 
-        return redirect('/inventory')->with('success', 'Đã cập nhật số lượng tồn kho thành công!');
+        return redirect()->route('admin.inventory.index')->with('success', 'Đã cập nhật số lượng tồn kho thành công!');
     }
 
     /**

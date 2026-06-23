@@ -18,7 +18,9 @@
         <div class="header-actions">
             <div class="notification-badge" title="Thông báo">
                 <i class="bi bi-bell fs-5"></i>
-                <span class="badge-dot"></span>
+                @if($lowStockInventories->isNotEmpty())
+                    <span class="badge-dot"></span>
+                @endif
             </div>
             <a href="{{ route('profile') }}" class="admin-profile-chip">
                 <div class="admin-avatar">
@@ -135,6 +137,40 @@
         </div>
     </div>
 
+    <!-- Low Stock Alerts -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-header-clean">
+                    <h5 class="dashboard-card-title mb-0"><i class="bi bi-exclamation-triangle me-2 text-warning"></i>Cảnh Báo Tồn Kho Thấp</h5>
+                    <a href="{{ route('admin.inventory.index') }}" class="order-action-link">Quản lý kho</a>
+                </div>
+                <div class="card-body-clean">
+                    @if($lowStockInventories->isEmpty())
+                        <div class="text-center text-muted py-3">Không có sản phẩm nào sắp hết hàng.</div>
+                    @else
+                        <div class="row g-3">
+                            @foreach($lowStockInventories as $inventory)
+                                <div class="col-12 col-md-6 col-xl-3">
+                                    <div class="low-stock-item">
+                                        <div>
+                                            <div class="fw-semibold">{{ optional($inventory->product)->name ?? 'N/A' }}</div>
+                                            <div class="small text-muted">{{ $inventory->location ?: 'Chưa có vị trí kho' }}</div>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="low-stock-count">{{ $inventory->quantity }}</div>
+                                            <a href="{{ route('admin.inventory.edit', $inventory) }}" class="small text-decoration-none">Cập nhật</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Charts Row -->
     <div class="row g-4 mb-4">
         <!-- Revenue Chart -->
@@ -241,14 +277,14 @@
                                 'processing' => 'Đang Xử Lý',
                                 'shipped' => 'Đang Giao',
                                 'delivered' => 'Đã Giao',
-                                'cancelled' => 'Đã Hủy'
+                                'canceled' => 'Đã Hủy'
                             ];
                             $statusBadges = [
                                 'pending' => 'bg-pending',
                                 'processing' => 'bg-processing',
                                 'shipped' => 'bg-shipping',
                                 'delivered' => 'bg-delivered',
-                                'cancelled' => 'bg-cancelled'
+                                'canceled' => 'bg-canceled'
                             ];
                         @endphp
                         @foreach($orderStatusData as $status)
@@ -302,14 +338,14 @@
                                             'processing' => 'bg-processing',
                                             'shipped' => 'bg-shipping',
                                             'delivered' => 'bg-delivered',
-                                            'cancelled' => 'bg-cancelled',
+                                            'canceled' => 'bg-canceled',
                                         ];
                                         $statusLabels = [
                                             'pending' => 'Chờ Xử Lý',
                                             'processing' => 'Đang Xử Lý',
                                             'shipped' => 'Đang Giao',
                                             'delivered' => 'Đã Giao',
-                                            'cancelled' => 'Đã Hủy',
+                                            'canceled' => 'Đã Hủy',
                                         ];
                                     @endphp
                                     <tr>

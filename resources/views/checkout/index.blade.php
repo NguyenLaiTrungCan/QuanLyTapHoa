@@ -168,7 +168,7 @@
                             <i class="bi bi-wallet2"></i>
                             Đặt hàng ngay
                         </button>
-                        <a href="/cart" class="btn btn-outline-secondary py-2 rounded-3">
+                        <a href="{{ route('cart.index') }}" class="btn btn-outline-secondary py-2 rounded-3">
                             <i class="bi bi-arrow-left me-1"></i> Quay lại giỏ hàng
                         </a>
                     </div>

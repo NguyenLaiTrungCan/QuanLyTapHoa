@@ -16,13 +16,13 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
-
+    
     @if($cartItems->isEmpty())
         <div class="text-center py-5 bg-white shadow-sm rounded border-0">
             <i class="bi bi-cart-x text-muted" style="font-size: 4rem;"></i>
             <h4 class="text-muted mt-3">Giỏ hàng của bạn đang trống</h4>
             <p class="mb-4">Hãy quay lại trang danh sách để chọn mua sản phẩm nhé!</p>
-            <a href="/products" class="btn text-white px-4 py-2" style="background-color: #22C55E;">
+            <a href="{{ route('products.index') }}" class="btn text-white px-4 py-2" style="background-color: #22C55E;">
                 Tiếp tục mua sắm
             </a>
         </div>
@@ -50,21 +50,27 @@
                                             </td>
                                             <td>{{ number_format($item->price, 0, ',', '.') }}đ</td>
                                             
-                                            <td style="width: 150px;">
-                                                <form action="/cart/update/{{ $item->id }}" method="POST" class="d-flex align-items-center justify-content-center">
+                                            <td style="width: 180px;">
+                                                @php($stock = optional($item->product->inventory)->quantity ?? 0)
+                                                <form action="{{ route('cart.update', $item->id) }}" method="POST" class="d-flex flex-column align-items-center justify-content-center gap-1">
                                                     @csrf
                                                     @method('PUT')
-                                                    <input type="number" name="quantity" class="form-control form-control-sm text-center me-2" value="{{ $item->quantity }}" min="1">
-                                                    <button type="submit" class="btn btn-sm btn-outline-secondary" title="Cập nhật">
-                                                        <i class="bi bi-arrow-repeat"></i>
-                                                    </button>
+                                                    <div class="d-flex align-items-center">
+                                                        <input type="number" name="quantity" class="form-control form-control-sm text-center me-2" value="{{ $item->quantity }}" min="1" max="{{ $stock }}">
+                                                        <button type="submit" class="btn btn-sm btn-outline-secondary" title="Cập nhật">
+                                                            <i class="bi bi-arrow-repeat"></i>
+                                                        </button>
+                                                    </div>
+                                                    @if($item->quantity > $stock)
+                                                        <span class="text-danger small fw-bold text-center" style="font-size: 0.75rem;">Vượt quá tồn kho (Tồn: {{ $stock }})</span>
+                                                    @endif
                                                 </form>
                                             </td>
                                             
                                             <td class="fw-bold">{{ number_format($item->price * $item->quantity, 0, ',', '.') }}đ</td>
                                             
                                             <td class="text-center pe-4">
-                                                <form action="/cart/remove/{{ $item->id }}" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?');">
+                                                <form action="{{ route('cart.remove', $item->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?');">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm text-danger border-0 bg-transparent" title="Xóa">
@@ -80,7 +86,7 @@
                     </div>
                 </div>
             </div>
-
+ 
             <div class="col-lg-4">
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
@@ -95,12 +101,12 @@
                             <span class="fw-bold fs-5">Tổng cộng:</span>
                             <span class="fw-bold fs-5" style="color: #EF4444;">{{ number_format($total, 0, ',', '.') }}đ</span>
                         </div>
-
+ 
                         <div class="d-grid gap-2">
-                            <a href="/checkout" class="btn text-white fw-bold py-2" style="background-color: #22C55E;">
+                            <a href="{{ route('checkout.index') }}" class="btn text-white fw-bold py-2" style="background-color: #22C55E;">
                                 Tiến hành thanh toán
                             </a>
-                            <a href="/products" class="btn btn-outline-secondary py-2">
+                            <a href="{{ route('products.index') }}" class="btn btn-outline-secondary py-2">
                                 Tiếp tục mua sắm
                             </a>
                         </div>

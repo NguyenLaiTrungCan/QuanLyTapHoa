@@ -11,7 +11,7 @@
                 <h1 class="page-title h2 mb-2">Danh Mục</h1>
                 <p class="text-muted mb-0">Quản lý danh mục sản phẩm theo phong cách sáng, rõ và đúng tinh thần UIUX.</p>
             </div>
-            <a href="{{ route('categories.create') }}" class="btn btn-success btn-lg">
+            <a href="{{ route('admin.categories.create') }}" class="btn btn-success btn-lg">
                 <i class="bi bi-plus-lg me-1"></i> Thêm danh mục
             </a>
         </div>
@@ -37,8 +37,8 @@
                         <td>{{ $category->description ?: 'Chưa có mô tả' }}</td>
                         <td><span class="badge text-bg-success rounded-pill">{{ $category->products_count }}</span></td>
                         <td class="text-end pe-4">
-                            <a href="{{ route('categories.edit', $category) }}" class="btn btn-sm btn-outline-primary">Sửa</a>
-                            <form action="{{ route('categories.destroy', $category) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa danh mục này?');">
+                            <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-sm btn-outline-primary">Sửa</a>
+                            <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa danh mục này?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>

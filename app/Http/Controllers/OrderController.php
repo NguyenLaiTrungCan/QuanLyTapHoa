@@ -3,10 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Inventory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -24,11 +21,15 @@ class OrderController extends Controller
             return redirect()->route('login');
         }
 
-        if ($user->isAdmin()) {
-            $orders = Order::with('user')->latest()->get();
-        } else {
-            $orders = Order::where('user_id', $user->id)->latest()->get();
+        $ordersQuery = Order::with('user')
+            ->withSum('orderItems as total_items', 'quantity')
+            ->latest();
+
+        if (! $user->isAdmin()) {
+            $ordersQuery->where('user_id', $user->id);
         }
+
+        $orders = $ordersQuery->paginate(10)->withQueryString();
 
         if ($request->expectsJson()) {
             return response()->json(['orders' => $orders]);
@@ -97,6 +98,7 @@ class OrderController extends Controller
             return back()->with('error', 'Chỉ có thể hủy đơn hàng ở trạng thái Chờ xử lý.');
         }
 
+        $order->loadMissing('orderItems');
         $cancelled = $order->cancel();
 
         if ($cancelled) {
@@ -144,6 +146,7 @@ class OrderController extends Controller
 
         if ($newStatus === 'canceled') {
             // Admin cancels the order - use the model cancel method to revert stock
+            $order->loadMissing('orderItems');
             $cancelled = $order->cancel();
             if (!$cancelled) {
                 if ($request->expectsJson()) {

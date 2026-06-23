@@ -12,7 +12,7 @@ class DashboardTest extends TestCase
 
     public function test_guest_cannot_access_admin_dashboard(): void
     {
-        $this->get(route('dashboard.index'))
+        $this->get(route('admin.dashboard.index'))
             ->assertRedirect(route('login'));
     }
 
@@ -23,7 +23,7 @@ class DashboardTest extends TestCase
         ]);
 
         $this->actingAs($user)
-            ->get(route('dashboard.index'))
+            ->get(route('admin.dashboard.index'))
             ->assertOk()
             ->assertSee('Dashboard');
     }

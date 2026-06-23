@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\DB;
+
 class Order extends Model
 {
     use HasFactory;
@@ -54,14 +55,20 @@ class Order extends Model
         return $this->status === 'pending';
     }
 
-    public function cancel() 
+    public function cancel()
     {
         if (!$this->canBeCancelled()) {
             return false;
         }
+
         return DB::transaction(function () {
+            $this->loadMissing('orderItems');
+
             foreach ($this->orderItems as $item) {
-                $inventory = Inventory::where('product_id', $item->product_id)->first();
+                $inventory = Inventory::where('product_id', $item->product_id)
+                    ->lockForUpdate()
+                    ->first();
+
                 if ($inventory) {
                     $inventory->increment('quantity', $item->quantity);
                 }

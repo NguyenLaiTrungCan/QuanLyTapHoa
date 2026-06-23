@@ -13,7 +13,7 @@
             </div>
 
             <div class="p-4 p-lg-5">
-                <form action="{{ route('categories.store') }}" method="POST">
+                <form action="{{ route('admin.categories.store') }}" method="POST">
                     @csrf
 
                     <div class="mb-3">
@@ -34,7 +34,7 @@
 
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-success btn-lg">Lưu danh mục</button>
-                        <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary btn-lg">Quay lại</a>
+                        <a href="{{ route('admin.categories.index') }}" class="btn btn-outline-secondary btn-lg">Quay lại</a>
                     </div>
                 </form>
             </div>

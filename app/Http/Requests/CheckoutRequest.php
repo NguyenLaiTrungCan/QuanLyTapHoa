@@ -24,8 +24,9 @@ class CheckoutRequest extends FormRequest
     {
         return [
             'delivery_address' => 'required|string|min:10|max:500',
-            'phone' => 'required|string|regex:/^[0-9\-\+\s()]+$/',
+            'phone' => 'required|string|max:20|regex:/^[0-9\-\+\s()]+$/',
             'note' => 'nullable|string|max:1000',
+            'payment_method' => 'required|string|in:COD,BANKING',
         ];
     }
     public function messages()
@@ -35,8 +36,11 @@ class CheckoutRequest extends FormRequest
             'delivery_address.min' => 'Địa chỉ giao hàng phải có ít nhất 10 ký tự.',
             'delivery_address.max' => 'Địa chỉ giao hàng không được vượt quá 500 ký tự.',
             'phone.required' => 'Vui lòng nhập số điện thoại.',
+            'phone.max' => 'Số điện thoại không được quá 20 ký tự.',
             'phone.regex' => 'Số điện thoại không hợp lệ.',
             'note.max' => 'Ghi chú không được quá 1000 ký tự',
+            'payment_method.required' => 'Vui lòng chọn phương thức thanh toán.',
+            'payment_method.in' => 'Phương thức thanh toán không hợp lệ.',
         ];
     }
 }

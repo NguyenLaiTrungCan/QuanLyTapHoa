@@ -18,11 +18,11 @@ class CartController extends Controller
     public function index()
     {
         $userId = Auth::id();
-        $cartItems = Cart::with('product')->where('user_id', $userId)->get();
+        $cartItems = Cart::with(['product.inventory'])->where('user_id', $userId)->get();
 
         $total = 0;
         
-       foreach ($cartItems as $item) {
+        foreach ($cartItems as $item) {
             $total += $item->quantity * $item->price;
         }
 
@@ -43,7 +43,11 @@ class CartController extends Controller
         // Business Logic: Check stock availability
         $inventory = Inventory::where('product_id', $productId)->first();
         if (!$inventory || $inventory->quantity < $requestedQty) {
-            return response()->json(['message' => 'Sản phẩm hết hàng hoặc số lượng không đủ.'], 400);
+            $msg = 'Sản phẩm hết hàng hoặc số lượng không đủ.';
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json(['message' => $msg], 400);
+            }
+            return back()->with('error', $msg);
         }
 
         // Check if product already exists in user's cart
@@ -55,7 +59,11 @@ class CartController extends Controller
             
             // Re-validate stock with new total quantity
             if ($inventory->quantity < $newQty) {
-                return response()->json(['message' => 'Tổng số lượng yêu cầu vượt quá số lượng có sẵn.'], 400);
+                $msg = 'Tổng số lượng yêu cầu vượt quá số lượng có sẵn.';
+                if ($request->expectsJson() || $request->is('api/*')) {
+                    return response()->json(['message' => $msg], 400);
+                }
+                return back()->with('error', $msg);
             }
             
             $cartItem->update(['quantity' => $newQty]);
@@ -63,11 +71,18 @@ class CartController extends Controller
             // Fetch product price to store in cart (snapshot price)
             $product = Product::findOrFail($productId);
             
-            Cart::create([
+            $cartItem = Cart::create([
                 'user_id' => $userId,
                 'product_id' => $productId,
                 'quantity' => $requestedQty,
                 'price' => $product->price
+            ]);
+        }
+
+        if ($request->expectsJson() || $request->is('api/*')) {
+            return response()->json([
+                'message' => 'Thêm sản phẩm thành công.',
+                'cart_item' => $cartItem->fresh()
             ]);
         }
 
@@ -87,10 +102,21 @@ class CartController extends Controller
         // Business Logic: Validate against stock
         $inventory = Inventory::where('product_id', $cartItem->product_id)->first();
         if (!$inventory || $inventory->quantity < $requestedQty) {
-            return response()->json(['message' => 'Số lượng yêu cầu vượt quá số lượng có sẵn.'], 400);
+            $msg = 'Số lượng yêu cầu vượt quá số lượng có sẵn.';
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json(['message' => $msg], 400);
+            }
+            return back()->with('error', $msg);
         }
 
         $cartItem->update(['quantity' => $requestedQty]);
+
+        if ($request->expectsJson() || $request->is('api/*')) {
+            return response()->json([
+                'message' => 'Đã cập nhật số lượng sản phẩm trong giỏ hàng.',
+                'cart_item' => $cartItem->fresh()
+            ]);
+        }
 
         return back()->with('success', 'Đã cập nhật số lượng sản phẩm trong giỏ hàng.');
     }
@@ -106,6 +132,10 @@ class CartController extends Controller
         
         $cartItem->delete();
 
+        if (request()->expectsJson() || request()->is('api/*')) {
+            return response()->json(['message' => 'Đã xóa sản phẩm khỏi giỏ hàng.']);
+        }
+
         return back()->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng.');
     }
 
@@ -117,6 +147,10 @@ class CartController extends Controller
     {
         $userId = Auth::id();
         Cart::where('user_id', $userId)->delete();
+
+        if (request()->expectsJson() || request()->is('api/*')) {
+            return response()->json(['message' => 'Đã xóa tất cả sản phẩm khỏi giỏ hàng.']);
+        }
 
         return back()->with('success', 'Đã xóa tất cả sản phẩm khỏi giỏ hàng.');
     }

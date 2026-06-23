@@ -9,7 +9,7 @@
                     <h4 class="fw-bold">Cập nhật Kho hàng</h4>
                 </div>
                 <div class="card-body p-4">
-                    <form action="/inventory/{{ $inventory->id }}" method="POST">
+                    <form action="{{ route('admin.inventory.update', $inventory) }}" method="POST">
                         @csrf
                         @method('PUT')
 
@@ -39,7 +39,7 @@
                         </div>
 
                         <div class="d-flex justify-content-end gap-2">
-                            <a href="/inventory" class="btn btn-light border">Hủy</a>
+                            <a href="{{ route('admin.inventory.index') }}" class="btn btn-light border">Hủy</a>
                             <button type="submit" class="btn text-white px-4" style="background-color: #22C55E;">
                                 Lưu cập nhật
                             </button>

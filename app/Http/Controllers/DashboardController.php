@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Inventory;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -24,11 +25,12 @@ class DashboardController extends Controller
         $totalOrders = Order::count();
 
         // Get revenue statistics
-        $monthlyRevenue = Order::whereYear('created_at', Carbon::now()->year)
+        $monthlyRevenue = Order::where('status', '!=', 'canceled')
+            ->whereYear('created_at', Carbon::now()->year)
             ->whereMonth('created_at', Carbon::now()->month)
             ->sum('total_price');
         
-        $totalRevenue = Order::sum('total_price');
+        $totalRevenue = Order::where('status', '!=', 'canceled')->sum('total_price');
 
         // Get revenue data for chart (last 30 days)
         $revenueChartData = $this->getRevenueChartData();
@@ -38,6 +40,13 @@ class DashboardController extends Controller
 
         // Get top selling products
         $topProducts = $this->getTopSellingProducts();
+
+        // Get low stock alerts
+        $lowStockInventories = Inventory::with('product')
+            ->where('quantity', '<=', 5)
+            ->orderBy('quantity')
+            ->limit(8)
+            ->get();
 
         // Get recent orders (10 newest)
         $recentOrders = Order::with(['user', 'orderItems.product'])
@@ -55,6 +64,7 @@ class DashboardController extends Controller
             'revenueChartData' => $revenueChartData,
             'orderStatusData' => $orderStatusData,
             'topProducts' => $topProducts,
+            'lowStockInventories' => $lowStockInventories,
             'recentOrders' => $recentOrders,
         ]);
     }
@@ -71,7 +81,8 @@ class DashboardController extends Controller
             $date = Carbon::now()->subDays($i);
             $days[] = $date->format('d/m');
 
-            $revenue = Order::whereDate('created_at', $date)
+            $revenue = Order::where('status', '!=', 'canceled')
+                ->whereDate('created_at', $date)
                 ->sum('total_price');
             $revenues[] = $revenue;
         }
@@ -87,14 +98,14 @@ class DashboardController extends Controller
      */
     private function getOrderStatusData()
     {
-        $statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+        $statuses = ['pending', 'processing', 'shipped', 'delivered', 'canceled'];
         $data = [];
         $colors = [
             'pending' => '#FFC107',    // Yellow
             'processing' => '#17A2B8', // Cyan
             'shipped' => '#007BFF',    // Blue
             'delivered' => '#28A745',  // Green
-            'cancelled' => '#DC3545',  // Red
+            'canceled' => '#DC3545',   // Red
         ];
 
         foreach ($statuses as $status) {

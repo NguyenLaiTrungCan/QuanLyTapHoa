@@ -37,7 +37,7 @@ class CategoryController extends Controller
         Category::create($request->validated());
 
         return redirect()
-            ->route('categories.index')
+            ->route('admin.categories.index')
             ->with('success', 'Đã tạo danh mục thành công.');
     }
 
@@ -57,7 +57,7 @@ class CategoryController extends Controller
             return view('products.index', compact('products', 'category', 'categories'));
         }
 
-        return redirect()->route('categories.index')->with('warning', 'Trang danh sách sản phẩm đang được xây dựng.');
+        return redirect()->route('admin.categories.index')->with('warning', 'Trang danh sách sản phẩm đang được xây dựng.');
     }
 
     /**
@@ -76,7 +76,7 @@ class CategoryController extends Controller
         $category->update($request->validated());
 
         return redirect()
-            ->route('categories.index')
+            ->route('admin.categories.index')
             ->with('success', "Danh mục '{$category->name}' đã được cập nhật.");
     }
 
@@ -92,7 +92,7 @@ class CategoryController extends Controller
         $category->delete();
 
         return redirect()
-            ->route('categories.index')
+            ->route('admin.categories.index')
             ->with('success', 'Đã xóa danh mục thành công.');
     }
 }

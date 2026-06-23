@@ -54,8 +54,9 @@
                 @endif
 
                 @if(Route::has('cart.add'))
-                    <form action="{{ route('cart.add', $product) }}" method="POST" class="mt-3">
+                    <form action="{{ route('cart.add') }}" method="POST" class="mt-3">
                         @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
                         <div class="mb-3" style="max-width: 220px;">
                             <label for="qty" class="form-label mb-1">Số lượng</label>
                             <div class="input-group">

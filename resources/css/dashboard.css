@@ -409,7 +409,7 @@
     color: #065F46;
 }
 
-.status-badge.bg-cancelled {
+.status-badge.bg-canceled {
     background-color: var(--dash-danger-light);
     color: #991B1B;
 }
@@ -460,7 +460,7 @@
 .bar-processing { background-color: var(--dash-primary); }
 .bar-shipped { background-color: var(--dash-info); }
 .bar-delivered { background-color: var(--dash-success); }
-.bar-cancelled { background-color: var(--dash-danger); }
+.bar-canceled { background-color: var(--dash-danger); }
 
 /* Table Styling for Recent Orders */
 .table-clean {
@@ -532,6 +532,24 @@
 .order-action-link:hover {
     background-color: var(--dash-primary);
     color: #fff;
+}
+
+.low-stock-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--dash-border);
+    border-radius: 12px;
+    background-color: #fff;
+}
+
+.low-stock-count {
+    min-width: 42px;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--dash-danger);
 }
 
 /* Responsive Grid Details */
