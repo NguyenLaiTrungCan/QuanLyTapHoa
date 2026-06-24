@@ -80,18 +80,22 @@ class CartController extends Controller
         }
 
         if ($request->expectsJson() || $request->is('api/*')) {
+            $cartCount = Cart::where('user_id', $userId)->count();
             return response()->json([
-                'message' => 'Thêm sản phẩm thành công.',
-                'cart_item' => $cartItem->fresh()
+                'message'    => 'Thêm sản phẩm thành công.',
+                'cart_item'  => $cartItem->fresh(),
+                'cart_count' => $cartCount,
             ]);
         }
 
         $returnTo = $request->input('return_to');
 
         if ($request->expectsJson() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+            $cartCount = Cart::where('user_id', $userId)->count();
             return response()->json([
-                'message' => 'Thêm sản phẩm thành công.',
-                'cart_item' => $cartItem->fresh(),
+                'message'    => 'Thêm sản phẩm thành công.',
+                'cart_item'  => $cartItem->fresh(),
+                'cart_count' => $cartCount,
             ]);
         }
 

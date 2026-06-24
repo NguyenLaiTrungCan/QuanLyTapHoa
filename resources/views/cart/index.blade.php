@@ -4,18 +4,8 @@
 <div class="container py-5" style="background-color: #F8FAFC; font-family: 'Poppins', sans-serif; color: #1E293B;">
     <h2 class="fw-bold mb-4">Giỏ hàng của bạn</h2>
 
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert" style="background-color: #22C55E; color: white; border: none;">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
+
+
     
     @if($cartItems->isEmpty())
         <div class="text-center py-5 bg-white shadow-sm rounded border-0">

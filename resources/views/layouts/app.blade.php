@@ -229,7 +229,8 @@
                     @auth
                         <a class="nav-icon-chip" href="{{ Route::has('cart.index') ? route('cart.index') : '#' }}" @if (! Route::has('cart.index')) aria-disabled="true" tabindex="-1" @endif>
                             <i class="bi bi-cart3"></i>
-                            <span class="badge text-bg-warning text-dark"></span>
+                            @php($cartCount = auth()->check() ? \App\Models\Cart::where('user_id', auth()->id())->count() : 0)
+                            <span id="cart-badge" class="badge text-bg-warning text-dark" style="{{ $cartCount === 0 ? 'display:none' : '' }}">{{ $cartCount ?: '' }}</span>
                         </a>
 
                         <div class="dropdown">
@@ -370,46 +371,91 @@
     };
 
     document.addEventListener('DOMContentLoaded', function () {
+
+        // ── Hàm cập nhật badge giỏ hàng ──────────────────────────────────────
+        function updateCartBadge(count) {
+            const badge = document.getElementById('cart-badge');
+            if (!badge) return;
+            if (count > 0) {
+                badge.textContent   = count;
+                badge.style.display = '';
+            } else {
+                badge.textContent   = '';
+                badge.style.display = 'none';
+            }
+        }
+
+        // ── AJAX: Thêm vào giỏ hàng ──────────────────────────────────────────
         document.querySelectorAll('form.cart-add-form').forEach(function (form) {
             form.addEventListener('submit', function (event) {
                 event.preventDefault();
 
-                const submitButton = form.querySelector('button[type="submit"]');
-                if (submitButton) {
-                    submitButton.disabled = true;
+                const btn       = form.querySelector('button[type="submit"]');
+                const origText  = btn ? btn.textContent.trim() : '';
+                const origClass = btn ? btn.className : '';
+
+                if (btn) {
+                    btn.disabled    = true;
+                    btn.textContent = 'Đang thêm...';
                 }
 
-                const formData = new FormData(form);
+                const formData  = new FormData(form);
                 const csrfToken = form.querySelector('input[name="_token"]')?.value || '';
 
                 fetch(form.action, {
-                    method: form.method || 'POST',
+                    method:  form.method || 'POST',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept':           'application/json',
+                        'X-CSRF-TOKEN':     csrfToken,
                     },
                     body: formData,
                 })
-                    .then(async function (response) {
-                        const data = await response.json().catch(function () {
-                            return {};
-                        });
+                .then(async function (response) {
+                    const data = await response.json().catch(function () { return {}; });
 
-                        if (response.ok) {
-                            window.showAppToast(data.message || 'Thêm sản phẩm thành công.', 'success');
-                        } else {
-                            window.showAppToast(data.message || 'Không thể thêm sản phẩm.', 'danger');
+                    if (response.ok) {
+                        // Cập nhật badge
+                        if (typeof data.cart_count !== 'undefined') {
+                            updateCartBadge(data.cart_count);
                         }
-                    })
-                    .catch(function () {
-                        window.showAppToast('Không thể thêm sản phẩm. Vui lòng thử lại.', 'danger');
-                    })
-                    .finally(function () {
-                        if (submitButton) {
-                            submitButton.disabled = false;
+
+                        window.showAppToast(data.message || 'Thêm sản phẩm thành công.', 'success');
+
+                        if (btn) {
+                            // Chuyển nút sang "✓ Đã thêm"
+                            btn.textContent = '✓ Đã thêm';
+                            btn.className   = btn.className
+                                .replace('btn-success', 'btn-outline-success')
+                                .replace('btn-primary', 'btn-outline-primary');
+
+                            setTimeout(function () {
+                                btn.textContent = origText;
+                                btn.className   = origClass;
+                                btn.disabled    = false;
+                            }, 1500);
                         }
-                    });
+                    } else {
+                        window.showAppToast(data.message || 'Không thể thêm sản phẩm.', 'danger');
+
+                        if (btn) {
+                            btn.textContent = 'Lỗi!';
+                            setTimeout(function () {
+                                btn.textContent = origText;
+                                btn.className   = origClass;
+                                btn.disabled    = false;
+                            }, 2000);
+                        }
+                    }
+                })
+                .catch(function () {
+                    window.showAppToast('Không thể thêm sản phẩm. Vui lòng thử lại.', 'danger');
+                    if (btn) {
+                        btn.textContent = origText;
+                        btn.className   = origClass;
+                        btn.disabled    = false;
+                    }
+                });
             });
         });
     });

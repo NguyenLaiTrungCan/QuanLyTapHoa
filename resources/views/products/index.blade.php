@@ -132,8 +132,9 @@
 
 @push('scripts')
 <script>
+    // ── Filter form auto-submit ──────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', function () {
-        const filterForm = document.getElementById('filterForm');
+        const filterForm   = document.getElementById('filterForm');
         const categoryForm = document.getElementById('categoryForm');
 
         if (filterForm) {
