@@ -101,23 +101,6 @@
                                 </div>
                             </label>
                         </div>
-                        <div class="col-md-6">
-                            <label class="payment-card-wrapper w-100" style="cursor: pointer;">
-                                <input type="radio" name="payment_method" value="BANKING" class="d-none payment-radio">
-                                <div class="payment-card p-3 border rounded-4 d-flex align-items-center gap-3 bg-light transition-all">
-                                    <div class="payment-icon bg-warning-subtle text-warning p-2 rounded-3 fs-4 d-flex">
-                                        <i class="bi bi-bank"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold text-slate-700">Chuyển khoản</div>
-                                        <div class="small text-muted">Qua ứng dụng ngân hàng</div>
-                                    </div>
-                                    <div class="ms-auto checked-indicator d-none">
-                                        <i class="bi bi-check-circle-fill text-success fs-5"></i>
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
                     </div>
                 </div>
             </div>
