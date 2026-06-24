@@ -10,7 +10,6 @@
                 <div class="text-center px-3">
                     <div class="section-badge mb-3"><i class="bi bi-person-check"></i> Customer Portal</div>
                     <h2 class="page-title fw-bold mb-3">Đăng nhập để mua sắm và quản lý đơn hàng.</h2>
-                    <p class="text-muted mb-0">Trang này bám theo layout UIUX: form gọn, rõ, và liên kết sang đăng ký.</p>
                 </div>
             </div>
             <div class="col-lg-6">
