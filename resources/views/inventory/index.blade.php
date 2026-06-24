@@ -33,7 +33,7 @@
                                 <td>{{ $item->location ?? 'Chưa phân bổ' }}</td>
                                 <td class="text-end pe-4">
                                     <a href="{{ route('admin.inventory.edit', $item) }}" class="btn btn-sm text-white" style="background-color: #22C55E;">
-                                        <i class="bi bi-pencil-square"></i> Edit
+                                        <i class="bi bi-pencil-square"></i> Sửa
                                     </a>
                                 </td>
                             </tr>
