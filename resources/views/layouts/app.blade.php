@@ -214,7 +214,7 @@
         <div class="container">
             <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{{ route('home') }}">
                 <span class="brand-mark"><i class="bi bi-shop fs-5"></i></span>
-                <span>Cửa hàng tạp hoá</span>
+                <span>Cửa Hàng Tạp Hóa</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>

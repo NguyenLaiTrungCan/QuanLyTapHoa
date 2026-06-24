@@ -25,7 +25,7 @@
     <div class="p-4 p-lg-5 border-bottom" style="background: linear-gradient(135deg, rgba(34,197,94,.12), rgba(250,204,21,.12));">
         <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
             <div>
-                <div class="section-badge mb-3"><i class="bi bi-receipt"></i> Order History</div>
+                <div class="section-badge mb-3"><i class="bi bi-receipt"></i> Lịch Sử Đơn Hàng</div>
                 <h1 class="page-title h2 mb-2">{{ auth()->user()->isAdmin() ? 'Tất cả đơn hàng' : 'Đơn hàng của tôi' }}</h1>
                 <p class="text-muted mb-0">Theo dõi trạng thái, xem chi tiết và hủy các đơn còn đang chờ xử lý.</p>
             </div>

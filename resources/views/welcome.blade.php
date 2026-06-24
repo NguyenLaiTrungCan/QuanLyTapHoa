@@ -6,7 +6,7 @@
 <section class="hero-panel p-4 p-lg-5 mb-4">
     <div class="row align-items-center g-4 position-relative">
         <div class="col-lg-7">
-            <span class="soft-pill mb-3"><i class="bi bi-shop"></i> Cửa hàng tạp hóa</span>
+            <span class="soft-pill mb-3"><i class="bi bi-shop"></i> Cửa Hàng Tạp Hóa</span>
             <h1 class="display-5 fw-bold brand-heading mb-3">Mua nhanh, theo dõi rõ, hàng hóa luôn sẵn sàng</h1>
             <div class="d-flex flex-wrap gap-2">
                 <a class="btn btn-success btn-lg" href="{{ route('products.index') }}">
@@ -75,7 +75,6 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
                     <div class="section-title mb-1">Sản phẩm bán chạy</div>
-                    <div class="subtle small">Ưu tiên theo số lượng đã bán, tự dùng sản phẩm mới nếu chưa có đơn hàng</div>
                 </div>
                 <a href="{{ route('products.index') }}" class="btn btn-outline-success btn-sm">Xem thêm</a>
             </div>
