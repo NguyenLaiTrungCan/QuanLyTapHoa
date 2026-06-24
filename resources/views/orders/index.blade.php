@@ -57,7 +57,7 @@
                     @if(auth()->user()->isAdmin())
                         <td>{{ optional($order->user)->name ?? 'Không rõ' }}</td>
                     @endif
-                    <td>{{ optional($order->created_at)->format('d/m/Y H:i') }}</td>
+                    <td>{{ optional($order->created_at)->timezone('Asia/Ho_Chi_Minh')->format('d/m/Y H:i') }}</td>
                     <td>{{ (int) ($order->total_items ?? 0) }}</td>
                     <td class="fw-semibold text-success">{{ number_format($order->total_price, 0, ',', '.') }}đ</td>
                     <td>
