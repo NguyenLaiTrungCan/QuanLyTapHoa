@@ -62,6 +62,9 @@ class ProductController extends Controller
 
         $product = Product::create($validated);
 
+        // Tự động tạo bản ghi kho hàng với số lượng ban đầu = 0
+        $product->inventory()->create(['quantity' => 0]);
+
         if ($request->is('api/*')) {
             return response()->json($product->load(['category', 'inventory']), 201);
         }

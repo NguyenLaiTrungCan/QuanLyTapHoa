@@ -300,7 +300,7 @@
         <div class="container d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
             <div>
                 <div class="fw-bold brand-heading">Quản Lý Tạp Hóa</div>
-                <div class="small subtle">Giao diện theo UI/UX của đồ án Laravel.</div>
+
             </div>
             <div class="small subtle">
                 Login, Register, Category, Profile

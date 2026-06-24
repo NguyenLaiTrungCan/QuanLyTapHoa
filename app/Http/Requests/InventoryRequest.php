@@ -19,10 +19,19 @@ class InventoryRequest extends FormRequest
      */
     public function rules(): array
     {
+        if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
+            // Khi cập nhật: chỉ cần quantity và location
+            return [
+                'quantity' => 'required|integer|min:0|max:999999',
+                'location' => 'nullable|string|max:255',
+            ];
+        }
+
+        // Khi tạo mới: yêu cầu product_id và unique
         return [
             'product_id' => 'required|integer|exists:products,id|unique:inventories,product_id',
-            'quantity' => 'required|integer|min:0|max:999999',
-            'location' => 'nullable|string|max:255',
+            'quantity'   => 'required|integer|min:0|max:999999',
+            'location'   => 'nullable|string|max:255',
         ];
     }
 
