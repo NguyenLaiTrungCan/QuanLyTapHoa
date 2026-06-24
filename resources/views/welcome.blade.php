@@ -82,7 +82,8 @@
                 @forelse($bestSellingProducts as $product)
                     @php($stock = optional($product->inventory)->quantity ?? 0)
                     <div class="col-md-6 col-xl-3">
-                        <div class="card h-100 border-0 shadow-sm rounded-4">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 position-relative overflow-hidden product-click-card">
+                            <a href="{{ route('products.show', $product) }}" class="stretched-link text-decoration-none text-reset"></a>
                             @if($product->image)
                                 <img src="{{ asset('storage/' . $product->image) }}" class="card-img-top rounded-top-4" alt="{{ $product->name }}" style="height: 150px; object-fit: cover;">
                             @else
@@ -94,9 +95,9 @@
                                 <div class="text-success fw-bold mb-2">{{ number_format($product->price, 0, ',', '.') }}đ</div>
                                 <div class="small text-muted mb-3">Còn {{ $stock }} trong kho</div>
                                 <div class="mt-auto d-grid gap-2">
-                                    <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm">Chi tiết</a>
+                                    <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm position-relative z-3">Chi tiết</a>
                                     @auth
-                                        <form action="{{ route('cart.add') }}" method="POST" class="cart-add-form">
+                                        <form action="{{ route('cart.add') }}" method="POST" class="cart-add-form position-relative z-3">
                                             @csrf
                                             <input type="hidden" name="product_id" value="{{ $product->id }}">
                                             <input type="hidden" name="quantity" value="1">
@@ -104,7 +105,7 @@
                                             <button type="submit" class="btn btn-success w-100 btn-sm" @disabled($stock <= 0)>Thêm vào giỏ</button>
                                         </form>
                                     @else
-                                        <a href="{{ route('login') }}" class="btn btn-success btn-sm">Đăng nhập để mua</a>
+                                        <a href="{{ route('login') }}" class="btn btn-success btn-sm position-relative z-3">Đăng nhập để mua</a>
                                     @endauth
                                 </div>
                             </div>

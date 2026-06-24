@@ -64,7 +64,8 @@
                 @forelse($products as $product)
                     @php($stock = optional($product->inventory)->quantity ?? 0)
                     <div class="col-12 col-md-6 col-xl-4">
-                        <div class="card h-100 section-card">
+                        <div class="card h-100 section-card position-relative overflow-hidden product-click-card">
+                            <a href="{{ route('products.show', $product) }}" class="stretched-link text-decoration-none text-reset"></a>
                             @if($product->image)
                                 <img src="{{ asset('storage/' . $product->image) }}" class="card-img-top" alt="{{ $product->name }}" style="height: 220px; object-fit: cover;">
                             @else
@@ -83,10 +84,9 @@
                                 @endif
 
                                 <div class="mt-auto d-flex gap-2">
-                                    <a class="btn btn-outline-primary btn-sm" href="{{ route('products.show', $product) }}">Chi tiết</a>
-
+                                    <a class="btn btn-outline-primary btn-sm position-relative z-3" href="{{ route('products.show', $product) }}">Chi tiết</a>
                                     @if(Route::has('cart.add'))
-                                        <form action="{{ route('cart.add') }}" method="POST" class="cart-add-form">
+                                        <form action="{{ route('cart.add') }}" method="POST" class="cart-add-form position-relative z-3">
                                             @csrf
                                             <input type="hidden" name="product_id" value="{{ $product->id }}">
                                             <input type="hidden" name="quantity" value="1">
