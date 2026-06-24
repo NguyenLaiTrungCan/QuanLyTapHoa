@@ -45,7 +45,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             return redirect()
-                ->intended(route('profile'))
+                ->intended(route('home'))
                 ->with('success', 'Đăng nhập thành công.');
         }
 
