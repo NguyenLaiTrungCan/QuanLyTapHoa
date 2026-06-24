@@ -8,7 +8,7 @@
         <div class="soft-card overflow-hidden">
             {{-- Header Banner --}}
             <div class="p-4 p-lg-5" style="background: linear-gradient(135deg, rgba(34,197,94,.12), rgba(250,204,21,.10));">
-                <div class="section-badge mb-3"><i class="bi bi-pencil-square"></i> Product Edit</div>
+                <div class="section-badge mb-3"><i class="bi bi-pencil-square"></i> Sửa</div>
                 <h1 class="page-title h3 mb-2">Chỉnh Sửa Sản Phẩm</h1>
                 <p class="text-muted mb-0">Cập nhật thông tin cho sản phẩm <strong>{{ $product->name }}</strong>.</p>
             </div>

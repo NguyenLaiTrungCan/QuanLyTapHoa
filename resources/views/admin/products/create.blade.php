@@ -8,7 +8,7 @@
         <div class="soft-card overflow-hidden">
             {{-- Header Banner --}}
             <div class="p-4 p-lg-5" style="background: linear-gradient(135deg, rgba(34,197,94,.12), rgba(250,204,21,.10));">
-                <div class="section-badge mb-3"><i class="bi bi-plus-circle"></i> Product Create</div>
+                <div class="section-badge mb-3"><i class="bi bi-plus-circle"></i>Tạo Sản Phẩm</div>
                 <h1 class="page-title h3 mb-2">Thêm Sản Phẩm Mới</h1>
                 <p class="text-muted mb-0">Điền đầy đủ thông tin để tạo sản phẩm mới trong hệ thống.</p>
             </div>
