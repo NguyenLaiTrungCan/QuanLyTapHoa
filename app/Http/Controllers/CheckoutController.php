@@ -25,7 +25,17 @@ class CheckoutController extends Controller
             return redirect()->route('login');
         }
 
-        $cartItems = Cart::where('user_id', $user->id)->with('product')->get();
+        // Nếu có selected items trong session (từ giỏ hàng), chỉ lấy những item đó
+        $selectedIds = session()->pull('checkout_selected_items'); // pull = đọc rồi xóa
+
+        $query = Cart::where('user_id', $user->id)->with('product');
+        if (!empty($selectedIds)) {
+            $query->whereIn('id', $selectedIds);
+            // Lưu lại để store() cũng biết (store() sử dụng POST nên không có session nữa)
+            session(['checkout_processing_items' => $selectedIds]);
+        }
+
+        $cartItems = $query->get();
 
         if ($cartItems->isEmpty()) {
             return redirect('/cart')->with('error', 'Giỏ hàng của bạn đang trống.');
@@ -53,7 +63,13 @@ class CheckoutController extends Controller
             return redirect()->route('login');
         }
 
-        $cartItems = Cart::where('user_id', $user->id)->with('product')->get();
+        // Lấy đúng items được chọn (lưu trong session bởi index())
+        $processingIds = session()->pull('checkout_processing_items');
+        $query = Cart::where('user_id', $user->id)->with('product');
+        if (!empty($processingIds)) {
+            $query->whereIn('id', $processingIds);
+        }
+        $cartItems = $query->get();
 
         if ($cartItems->isEmpty()) {
             if ($request->expectsJson()) {
@@ -107,8 +123,9 @@ class CheckoutController extends Controller
                 $inventory->decrement('quantity', $item->quantity);
             }
 
-            // Clear Cart
-            Cart::where('user_id', $user->id)->delete();
+            // Chỉ xóa các items đã được thanh toán (không xóa cả giỏ nếu chỉ chọn một phần)
+            $orderedIds = $cartItems->pluck('id')->toArray();
+            Cart::whereIn('id', $orderedIds)->delete();
 
             DB::commit();
 

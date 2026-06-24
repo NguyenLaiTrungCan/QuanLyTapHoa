@@ -90,6 +90,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/update/{id}', [CartController::class, 'update'])->name('update');
         Route::delete('/remove/{id}', [CartController::class, 'remove'])->name('remove');
         Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
+        Route::post('/checkout-selected', [CartController::class, 'checkoutSelected'])->name('checkout.selected');
     });
 
     // Checkout

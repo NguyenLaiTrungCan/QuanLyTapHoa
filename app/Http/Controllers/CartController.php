@@ -177,4 +177,35 @@ class CartController extends Controller
 
         return back()->with('success', 'Đã xóa tất cả sản phẩm khỏi giỏ hàng.');
     }
+
+    /**
+     * Lưu danh sách cart item được chọn vào session, sau đó redirect sang checkout
+     * POST /cart/checkout-selected
+     */
+    public function checkoutSelected(Request $request)
+    {
+        $validated = $request->validate([
+            'selected_items'   => 'required|array|min:1',
+            'selected_items.*' => 'integer|exists:carts,id',
+        ], [
+            'selected_items.required' => 'Vui lòng chọn ít nhất một sản phẩm.',
+            'selected_items.min'      => 'Vui lòng chọn ít nhất một sản phẩm.',
+        ]);
+
+        // Đảm bảo các item thuộc về user hiện tại
+        $userId = Auth::id();
+        $ownedIds = Cart::where('user_id', $userId)
+            ->whereIn('id', $validated['selected_items'])
+            ->pluck('id')
+            ->toArray();
+
+        if (empty($ownedIds)) {
+            return back()->with('error', 'Không tìm thấy sản phẩm hợp lệ.');
+        }
+
+        // Lưu vào session để CheckoutController đọc
+        session(['checkout_selected_items' => $ownedIds]);
+
+        return redirect()->route('checkout.index');
+    }
 }

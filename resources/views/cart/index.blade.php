@@ -20,12 +20,29 @@
         <div class="row">
             <div class="col-lg-8 mb-4">
                 <div class="card shadow-sm border-0">
+                    {{-- Toolbar: Chọn tất cả + Xóa toàn bộ --}}
+                    <div class="d-flex align-items-center justify-content-between px-4 py-3 border-bottom bg-light">
+                        <div class="form-check mb-0">
+                            <input class="form-check-input" type="checkbox" id="select-all">
+                            <label class="form-check-label fw-semibold" for="select-all">Chọn tất cả</label>
+                        </div>
+                        <form action="{{ route('cart.clear') }}" method="POST"
+                              onsubmit="return confirm('Bạn có chắc muốn xóa toàn bộ giỏ hàng?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash3 me-1"></i>Xóa toàn bộ
+                            </button>
+                        </form>
+                    </div>
+
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table align-middle mb-0">
                                 <thead class="table-light">
                                     <tr>
-                                        <th scope="col" class="ps-4">Sản Phẩm</th>
+                                        <th scope="col" class="ps-3" style="width:48px;"></th>
+                                        <th scope="col" class="ps-2">Sản Phẩm</th>
                                         <th scope="col">Giá</th>
                                         <th scope="col" class="text-center">Số Lượng</th>
                                         <th scope="col">Tổng Tiền</th>
@@ -36,11 +53,16 @@
                                     @foreach($cartItems as $item)
                                         @php($stock = optional($item->product->inventory)->quantity ?? 0)
                                         <tr data-cart-id="{{ $item->id }}" data-price="{{ $item->price }}">
-                                            <td class="ps-4 fw-medium">
+                                            <td class="ps-3">
+                                                <input class="form-check-input item-checkbox" type="checkbox"
+                                                       value="{{ $item->id }}" checked
+                                                       data-cart-id="{{ $item->id }}">
+                                            </td>
+                                            <td class="ps-2 fw-medium">
                                                 {{ $item->product->name ?? 'N/A' }}
                                             </td>
                                             <td>{{ number_format($item->price, 0, ',', '.') }}đ</td>
-                                            
+
                                             <td style="width: 180px;">
                                                 <div class="d-flex flex-column align-items-center justify-content-center gap-1">
                                                     <div class="d-flex align-items-center">
@@ -59,9 +81,9 @@
                                                     <span class="update-status small" style="font-size: 0.72rem;"></span>
                                                 </div>
                                             </td>
-                                            
+
                                             <td class="fw-bold row-total">{{ number_format($item->price * $item->quantity, 0, ',', '.') }}đ</td>
-                                            
+
                                             <td class="text-center pe-4">
                                                 <form action="{{ route('cart.remove', $item->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?');">
                                                     @csrf
@@ -84,7 +106,12 @@
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
                         <h5 class="fw-bold mb-4">Tóm tắt đơn hàng</h5>
-                        
+
+                        {{-- Cảnh báo khi không chọn sản phẩm nào --}}
+                        <div id="no-selection-warning" class="alert alert-warning py-2 small mb-3" style="display:none;">
+                            <i class="bi bi-exclamation-triangle me-1"></i> Vui lòng chọn ít nhất một sản phẩm.
+                        </div>
+
                         <div class="d-flex justify-content-between mb-3">
                             <span class="text-muted">Tạm tính (<span id="total-qty">{{ $cartItems->sum('quantity') }}</span> sản phẩm)</span>
                             <span class="fw-medium" id="subtotal-display">{{ number_format($total, 0, ',', '.') }}đ</span>
@@ -95,14 +122,19 @@
                             <span class="fw-bold fs-5" id="grand-total-display" style="color: #EF4444;">{{ number_format($total, 0, ',', '.') }}đ</span>
                         </div>
  
-                        <div class="d-grid gap-2">
-                            <a href="{{ route('checkout.index') }}" class="btn text-white fw-bold py-2" style="background-color: #22C55E;">
-                                Tiến hành thanh toán
-                            </a>
-                            <a href="{{ route('products.index') }}" class="btn btn-outline-secondary py-2">
-                                Tiếp tục mua sắm
-                            </a>
-                        </div>
+                        {{-- Form gửi selected IDs → session → checkout --}}
+                        <form id="checkout-form" action="{{ route('cart.checkout.selected') }}" method="POST">
+                            @csrf
+                            <div id="selected-ids-container"></div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" id="checkout-btn" class="btn text-white fw-bold py-2" style="background-color: #22C55E;">
+                                    Tiến hành thanh toán
+                                </button>
+                                <a href="{{ route('products.index') }}" class="btn btn-outline-secondary py-2">
+                                    Tiếp tục mua sắm
+                                </a>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -113,30 +145,76 @@
 
 @push('scripts')
 <script>
-    // Format số kiểu Việt Nam: dấu chấm ngăn hàng nghìn
     function formatVND(amount) {
         return amount.toLocaleString('vi-VN') + 'đ';
     }
 
-    // Tính lại Tổng cộng từ tất cả các hàng
+    // ── Tính tổng chỉ từ các hàng được CHỌN ─────────────────────────────────
     function recalcGrandTotal() {
         let grandTotal = 0;
-        let totalQty = 0;
+        let totalQty   = 0;
 
         document.querySelectorAll('tr[data-cart-id]').forEach(row => {
-            const price = parseFloat(row.dataset.price);
+            const cb = row.querySelector('.item-checkbox');
+            if (!cb || !cb.checked) return;          // bỏ qua hàng không được chọn
+
+            const price    = parseFloat(row.dataset.price);
             const qtyInput = row.querySelector('.qty-input');
-            const qty = parseInt(qtyInput.value) || 1;
-            grandTotal += price * qty;
-            totalQty += qty;
+            const qty      = parseInt(qtyInput.value) || 1;
+            grandTotal    += price * qty;
+            totalQty      += qty;
         });
 
-        document.getElementById('subtotal-display').textContent   = formatVND(grandTotal);
+        document.getElementById('subtotal-display').textContent    = formatVND(grandTotal);
         document.getElementById('grand-total-display').textContent = formatVND(grandTotal);
         document.getElementById('total-qty').textContent           = totalQty;
+
+        // Cảnh báo nếu không có sản phẩm nào được chọn
+        const warning   = document.getElementById('no-selection-warning');
+        const btn       = document.getElementById('checkout-btn');
+        const noneSelected = totalQty === 0;
+        warning.style.display = noneSelected ? 'block' : 'none';
+        btn.disabled          = noneSelected;
+
+        // Cập nhật hidden inputs cho form checkout
+        syncSelectedInputs();
     }
 
-    // Debounce để tránh gọi API liên tục khi user gõ nhanh
+    // Đồng bộ các hidden input <selected_items[]> với checkbox đang checked
+    function syncSelectedInputs() {
+        const container = document.getElementById('selected-ids-container');
+        container.innerHTML = '';
+        document.querySelectorAll('.item-checkbox:checked').forEach(cb => {
+            const input = document.createElement('input');
+            input.type  = 'hidden';
+            input.name  = 'selected_items[]';
+            input.value = cb.value;
+            container.appendChild(input);
+        });
+    }
+
+    // ── Checkbox: Chọn tất cả ────────────────────────────────────────────────
+    const selectAll = document.getElementById('select-all');
+    selectAll.addEventListener('change', function () {
+        document.querySelectorAll('.item-checkbox').forEach(cb => {
+            cb.checked = this.checked;
+        });
+        recalcGrandTotal();
+    });
+
+    // ── Checkbox: Từng sản phẩm ──────────────────────────────────────────────
+    document.querySelectorAll('.item-checkbox').forEach(cb => {
+        cb.addEventListener('change', function () {
+            // Cập nhật trạng thái "chọn tất cả"
+            const all    = document.querySelectorAll('.item-checkbox');
+            const checked = document.querySelectorAll('.item-checkbox:checked');
+            selectAll.indeterminate = checked.length > 0 && checked.length < all.length;
+            selectAll.checked       = checked.length === all.length;
+            recalcGrandTotal();
+        });
+    });
+
+    // ── Qty input debounce ───────────────────────────────────────────────────
     function debounce(fn, delay) {
         let timer;
         return function (...args) {
@@ -146,23 +224,20 @@
     }
 
     async function updateCartItem(cartId, qty, input) {
-        const row       = input.closest('tr');
-        const stock     = parseInt(input.dataset.stock);
-        const price     = parseFloat(input.dataset.price);
-        const warning   = row.querySelector('.stock-warning');
-        const statusEl  = row.querySelector('.update-status');
-        const rowTotal  = row.querySelector('.row-total');
+        const row      = input.closest('tr');
+        const stock    = parseInt(input.dataset.stock);
+        const price    = parseFloat(input.dataset.price);
+        const warning  = row.querySelector('.stock-warning');
+        const statusEl = row.querySelector('.update-status');
+        const rowTotal = row.querySelector('.row-total');
 
-        // Validate phía client
         if (qty < 1) { input.value = 1; qty = 1; }
         if (qty > stock) {
             warning.style.display = 'block';
             warning.textContent   = `Vượt quá tồn kho (Tồn: ${stock})`;
-            // Vẫn cho cập nhật UI tạm thời nhưng server sẽ từ chối
         } else {
             warning.style.display = 'none';
         }
-
 
         rowTotal.textContent = formatVND(price * qty);
         recalcGrandTotal();
@@ -178,13 +253,10 @@
                 },
                 body: JSON.stringify({ quantity: qty }),
             });
-
             const data = await res.json();
-
             if (res.ok) {
                 setTimeout(() => { statusEl.textContent = ''; }, 1500);
             } else {
-                // Server từ chối (vd: vượt tồn kho)
                 statusEl.style.color = '#EF4444';
                 statusEl.textContent = data.message || 'Lỗi cập nhật';
                 warning.style.display = 'block';
@@ -200,33 +272,19 @@
 
     document.querySelectorAll('.qty-input').forEach(input => {
         input.addEventListener('input', function () {
-            const cartId = this.dataset.cartId;
             let qty = parseInt(this.value);
-
-            // Nếu chưa nhập xong (trường rỗng hoặc đang gõ) thì chờ
             if (this.value === '' || isNaN(qty)) return;
-
-            // Ngay lập tức clamp về min=1 nếu user gõ số không hợp lệ
-            if (qty < 1) {
-                this.value = 1;
-                qty = 1;
-            }
-
-            debouncedUpdate(cartId, qty, this);
+            if (qty < 1) { this.value = 1; qty = 1; }
+            debouncedUpdate(this.dataset.cartId, qty, this);
         });
-
-        // Khi user rời ô (blur/change): đảm bảo không để lại giá trị 0
         input.addEventListener('change', function () {
-            const cartId = this.dataset.cartId;
             let qty = parseInt(this.value);
-
-            if (isNaN(qty) || qty < 1) {
-                this.value = 1;
-                qty = 1;
-            }
-
-            updateCartItem(cartId, qty, this);
+            if (isNaN(qty) || qty < 1) { this.value = 1; qty = 1; }
+            updateCartItem(this.dataset.cartId, qty, this);
         });
     });
+
+    // Khởi tạo lần đầu
+    recalcGrandTotal();
 </script>
 @endpush
