@@ -46,8 +46,8 @@ Route::middleware(['auth'])->group(function () {
         // Hiển thị danh sách kho (GET /inventory)
         Route::get('/', [InventoryController::class, 'index']);
         
-        // Hiển thị form cập nhật kho (GET /inventory/{id}/edit)
-        Route::get('/{id}/edit', [InventoryController::class, 'edit']);
+        // Hiển thị thông tin chi tiết kho (GET /inventory/{id}/show)
+        Route::get('/{id}/show', [InventoryController::class, 'show']);
         
         // Xử lý lưu dữ liệu cập nhật kho (PUT /inventory/{id})
         Route::put('/{id}', [InventoryController::class, 'update']);
