@@ -7,9 +7,8 @@
     <div class="col-lg-10">
         <div class="soft-card overflow-hidden mb-4">
             <div class="p-4 p-lg-5" style="background: linear-gradient(135deg, rgba(34,197,94,.12), rgba(250,204,21,.10));">
-                <div class="section-badge mb-3"><i class="bi bi-gear"></i> Update Profile</div>
-                <h1 class="page-title h3 mb-2">Cập Nhật Thông Tin Cá Nhân</h1>
-                <p class="text-muted mb-0">Giữ form rõ ràng, nhiều khoảng trắng và đúng bộ màu UIUX.</p>
+                <div class="section-badge mb-3"><i class="bi bi-gear"></i>Cập Nhật Hồ Sơ</div>
+                <h1 class="page-title h3 mb-2">Thông Tin Cá Nhân</h1>
             </div>
 
             <div class="p-4 p-lg-5">
@@ -53,9 +52,8 @@
 
         <div class="soft-card overflow-hidden">
             <div class="p-4 p-lg-5 border-bottom" style="background: linear-gradient(135deg, rgba(34,197,94,.12), rgba(250,204,21,.10));">
-                <div class="section-badge mb-3"><i class="bi bi-shield-lock"></i> Password</div>
+                <div class="section-badge mb-3"><i class="bi bi-shield-lock"></i> Mật Khẩu</div>
                 <h2 class="page-title h4 mb-2">Đổi Mật Khẩu</h2>
-                <p class="text-muted mb-0">Khu vực đổi mật khẩu theo kiểu rõ ràng, đơn giản và dễ nhập.</p>
             </div>
 
             <div class="p-4 p-lg-5">
