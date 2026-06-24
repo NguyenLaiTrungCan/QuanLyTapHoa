@@ -52,7 +52,7 @@ class InventoryController extends Controller
             'location' => $request->location ?? $inventory->location
         ]);
 
-        return redirect()->route('admin.inventory.index')->with('success', 'Đã cập nhật số lượng tồn kho thành công!');
+        return redirect()->route('admin.inventory.index')->with('success', 'Cập nhật kho hàng thành công.');
     }
 
     /**
