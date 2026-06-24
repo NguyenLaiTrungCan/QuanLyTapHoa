@@ -16,12 +16,6 @@
             <p class="header-subtitle mb-0">Theo dõi tình hình kinh doanh hôm nay</p>
         </div>
         <div class="header-actions">
-            <div class="notification-badge" title="Thông báo">
-                <i class="bi bi-bell fs-5"></i>
-                @if($lowStockInventories->isNotEmpty())
-                    <span class="badge-dot"></span>
-                @endif
-            </div>
             <a href="{{ route('profile') }}" class="admin-profile-chip">
                 <div class="admin-avatar">
                     {{ substr(auth()->user()->name, 0, 1) }}
@@ -42,9 +36,6 @@
                     </div>
                     <div class="kpi-label">Tổng Sản Phẩm</div>
                     <div class="kpi-value">{{ $totalProducts }}</div>
-                    <div class="kpi-trend trend-neutral">
-                        <i class="bi bi-plus-circle-fill"></i> +12 sản phẩm mới
-                    </div>
                 </div>
             </div>
         </div>
@@ -58,9 +49,6 @@
                     </div>
                     <div class="kpi-label">Tổng Danh Mục</div>
                     <div class="kpi-value">{{ $totalCategories }}</div>
-                    <div class="kpi-trend trend-neutral">
-                        <i class="bi bi-plus-circle-fill"></i> +1 danh mục mới
-                    </div>
                 </div>
             </div>
         </div>
@@ -74,9 +62,6 @@
                     </div>
                     <div class="kpi-label">Tổng Người Dùng</div>
                     <div class="kpi-value">{{ $totalUsers }}</div>
-                    <div class="kpi-trend trend-neutral">
-                        <i class="bi bi-person-plus-fill"></i> +15 người dùng mới
-                    </div>
                 </div>
             </div>
         </div>
@@ -90,9 +75,6 @@
                     </div>
                     <div class="kpi-label">Tổng Đơn Hàng</div>
                     <div class="kpi-value">{{ $totalOrders }}</div>
-                    <div class="kpi-trend trend-up">
-                        <i class="bi bi-graph-up-arrow"></i> +18 hôm nay
-                    </div>
                 </div>
             </div>
         </div>
@@ -107,9 +89,6 @@
                     <div>
                         <div class="kpi-label">Doanh Thu Tháng</div>
                         <div class="revenue-card-value text-success">{{ number_format($monthlyRevenue, 0, ',', '.') }} ₫</div>
-                        <div class="revenue-trend text-success">
-                            <i class="bi bi-arrow-up-right-circle-fill"></i> +15% so với tháng trước
-                        </div>
                     </div>
                     <div class="fs-1 text-success opacity-25">
                         <i class="bi bi-currency-dollar"></i>
@@ -125,9 +104,6 @@
                     <div>
                         <div class="kpi-label">Tổng Doanh Thu</div>
                         <div class="revenue-card-value text-primary">{{ number_format($totalRevenue, 0, ',', '.') }} ₫</div>
-                        <div class="revenue-trend text-primary">
-                            <i class="bi bi-arrow-up-right-circle-fill"></i> +22% năm nay
-                        </div>
                     </div>
                     <div class="fs-1 text-primary opacity-25">
                         <i class="bi bi-wallet2"></i>
