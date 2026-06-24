@@ -4,7 +4,7 @@
 
 @section('content')
 @php
-    $currentSort = request('sort', 'id_desc');
+    $currentSort = request('sort', 'id_asc');
     $qp = request()->except(['sort', 'page']);
     $urlIdAsc = route('admin.products.index', array_merge($qp, ['sort' => 'id_asc']));
     $urlIdDesc = route('admin.products.index', array_merge($qp, ['sort' => 'id_desc']));
@@ -14,8 +14,8 @@
 
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
     <div>
-        <div class="section-badge"><i class="bi bi-box-seam"></i> Quản trị</div>
-        <h1 class="page-title h2 mb-1 mt-2">Quản lý sản phẩm</h1>
+        <div class="section-badge"><i class="bi bi-box-seam"></i> Quản Lý Sản Phẩm</div>
+        <h1 class="page-title h2 mb-1 mt-2">Sản Phẩm</h1>
     </div>
     <div class="d-flex gap-2">
         <a href="{{ route('admin.products.create') }}" class="btn btn-success">+ Tạo mới</a>

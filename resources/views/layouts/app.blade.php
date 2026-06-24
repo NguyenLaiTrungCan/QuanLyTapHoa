@@ -229,7 +229,7 @@
                     @auth
                         <a class="nav-icon-chip" href="{{ Route::has('cart.index') ? route('cart.index') : '#' }}" @if (! Route::has('cart.index')) aria-disabled="true" tabindex="-1" @endif>
                             <i class="bi bi-cart3"></i>
-                            <span class="badge text-bg-warning text-dark">0</span>
+                            <span class="badge text-bg-warning text-dark"></span>
                         </a>
 
                         <div class="dropdown">
@@ -238,23 +238,22 @@
                             </button>
                             <ul class="dropdown-menu dropdown-user-menu dropdown-menu-end p-2">
                                 @if (auth()->user()->isAdmin())
-                                    <li><a class="dropdown-item rounded-3" href="{{ route('admin.dashboard.index') }}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
-                                    <li><a class="dropdown-item rounded-3" href="{{ route('admin.products.index') }}"><i class="bi bi-box-seam me-2"></i>Products</a></li>
-                                    <li><a class="dropdown-item rounded-3" href="{{ route('admin.categories.index') }}"><i class="bi bi-tags me-2"></i>Categories</a></li>
-                                    <li><a class="dropdown-item rounded-3" href="{{ route('admin.inventory.index') }}"><i class="bi bi-clipboard-data me-2"></i>Inventory</a></li>
-                                    <li><a class="dropdown-item rounded-3" href="{{ route('orders.index') }}"><i class="bi bi-receipt-cutoff me-2"></i>Orders</a></li>
+                                    <li><a class="dropdown-item rounded-3" href="{{ route('admin.dashboard.index') }}"><i class="bi bi-speedometer2 me-2"></i>Bảng Điều Khiển</a></li>
+                                    <li><a class="dropdown-item rounded-3" href="{{ route('admin.products.index') }}"><i class="bi bi-box-seam me-2"></i>Sản Phẩm</a></li>
+                                    <li><a class="dropdown-item rounded-3" href="{{ route('admin.categories.index') }}"><i class="bi bi-tags me-2"></i>Danh Mục</a></li>
+                                    <li><a class="dropdown-item rounded-3" href="{{ route('admin.inventory.index') }}"><i class="bi bi-clipboard-data me-2"></i>Kho Hàng</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                 @endif
-                                <li><a class="dropdown-item rounded-3" href="{{ route('profile') }}"><i class="bi bi-person me-2"></i>Profile</a></li>
-                                <li><a class="dropdown-item rounded-3" href="{{ route('profile.edit') }}"><i class="bi bi-pencil-square me-2"></i>Chỉnh sửa hồ sơ</a></li>
+                                <li><a class="dropdown-item rounded-3" href="{{ route('profile') }}"><i class="bi bi-person me-2"></i>Hồ Sơ</a></li>
+                                <li><a class="dropdown-item rounded-3" href="{{ route('profile.edit') }}"><i class="bi bi-pencil-square me-2"></i>Chỉnh Sửa Hồ Sơ</a></li>
                                 @if (Route::has('orders.index'))
-                                    <li><a class="dropdown-item rounded-3" href="{{ route('orders.index') }}"><i class="bi bi-receipt me-2"></i>Orders</a></li>
+                                    <li><a class="dropdown-item rounded-3" href="{{ route('orders.index') }}"><i class="bi bi-receipt me-2"></i>Đơn Hàng</a></li>
                                 @endif
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form action="{{ route('logout') }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="dropdown-item rounded-3 text-danger"><i class="bi bi-box-arrow-right me-2"></i>Logout</button>
+                                        <button type="submit" class="dropdown-item rounded-3 text-danger"><i class="bi bi-box-arrow-right me-2"></i>Đăng Xuất</button>
                                     </form>
                                 </li>
                             </ul>
@@ -319,9 +318,6 @@
             <div>
                 <div class="fw-bold brand-heading">Quản Lý Tạp Hóa</div>
 
-            </div>
-            <div class="small subtle">
-                Login, Register, Category, Profile
             </div>
         </div>
     </footer>

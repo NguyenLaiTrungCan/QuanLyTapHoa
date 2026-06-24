@@ -7,10 +7,8 @@
     <div class="p-4 p-lg-5 border-bottom" style="background: linear-gradient(135deg, rgba(34,197,94,.12), rgba(250,204,21,.12));">
         <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
             <div>
-                <div class="section-badge mb-3"><i class="bi bi-tags"></i> Category Management</div>
-                <h1 class="page-title h2 mb-2">Danh Mục</h1>
-                <p class="text-muted mb-0">Quản lý danh mục sản phẩm theo phong cách sáng, rõ và đúng tinh thần UIUX.</p>
-            </div>
+                <div class="section-badge mb-3"><i class="bi bi-tags"></i> Quản Lý Danh Mục</div>
+                <h1 class="page-title h2 mb-2">Danh Mục</h1>            </div>
             <a href="{{ route('admin.categories.create') }}" class="btn btn-success btn-lg">
                 <i class="bi bi-plus-lg me-1"></i> Thêm danh mục
             </a>

@@ -104,7 +104,7 @@ class CartController extends Controller
         if (!$inventory || $inventory->quantity < $requestedQty) {
             $msg = 'Số lượng yêu cầu vượt quá số lượng có sẵn.';
             if ($request->expectsJson() || $request->is('api/*')) {
-                return response()->json(['message' => $msg], 400);
+                return response()->json(400);
             }
             return back()->with('error', $msg);
         }
@@ -113,12 +113,11 @@ class CartController extends Controller
 
         if ($request->expectsJson() || $request->is('api/*')) {
             return response()->json([
-                'message' => 'Đã cập nhật số lượng sản phẩm trong giỏ hàng.',
                 'cart_item' => $cartItem->fresh()
             ]);
         }
 
-        return back()->with('success', 'Đã cập nhật số lượng sản phẩm trong giỏ hàng.');
+        return redirect()->route('cart.index');
     }
 
     /**

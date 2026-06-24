@@ -28,10 +28,10 @@ class ProductController extends Controller
             $query->orderBy('price');
         } elseif ($sort === 'price_desc') {
             $query->orderByDesc('price');
-        } elseif ($sort === 'id_asc') {
-            $query->orderBy('id');
+        } elseif ($sort === 'id_desc') {
+            $query->latest('id');
         } else {
-            $query->latest('id'); // id_desc (mặc định)
+            $query->oldest('id'); // id_asc (mặc định: từ 1 → n)
         }
 
         if ($request->is('api/*')) {
