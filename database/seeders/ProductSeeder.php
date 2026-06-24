@@ -18,7 +18,7 @@ class ProductSeeder extends Seeder
                 'name' => 'Mì Hảo Hảo Tôm Chua Cay',
                 'price' => 4500,
                 'description' => 'Mì ăn liền vị tôm chua cay.',
-                'category_id' => 4,
+                'category_id' => 3,
                 'image' => 'products/haohao.jpg',
             ],
             [

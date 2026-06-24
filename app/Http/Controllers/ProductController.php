@@ -112,6 +112,22 @@ class ProductController extends Controller
             ->with('success', 'Cập nhật sản phẩm thành công.');
     }
 
+    public function updateStock(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'quantity' => ['required', 'integer', 'min:0', 'max:999999'],
+        ]);
+
+        $inventory = $product->inventory()->firstOrNew(['product_id' => $product->id]);
+        $inventory->quantity = $validated['quantity'];
+        $inventory->location = $inventory->exists ? $inventory->location : 'Kệ A';
+        $inventory->save();
+
+        return redirect()
+            ->route('admin.products.index')
+            ->with('success', 'Đã cập nhật tồn kho cho sản phẩm thành công.');
+    }
+
     public function destroy(Product $product)
     {
         $this->deleteImage($product->image);

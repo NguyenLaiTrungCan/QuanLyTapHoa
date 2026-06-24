@@ -1,63 +1,49 @@
-<!doctype html>
-<html lang="vi">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Chi tiết sản phẩm</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: #f8fafc;
-        }
+@extends('layouts.app')
 
-        .detail-card {
-            max-width: 760px;
-            margin: 0 auto;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            background: #fff;
-            overflow: hidden;
-        }
+@section('title', 'Chi tiết sản phẩm')
 
-        .detail-image {
-            width: 100%;
-            height: 360px;
-            object-fit: cover;
-        }
-    </style>
-</head>
-<body class="bg-light">
-<div class="container py-4">
-    <a href="{{ route('products.index') }}" class="btn btn-link px-0">&larr; Quay lại danh sách</a>
-
-    <div class="detail-card">
+@section('content')
+<div class="d-flex flex-column gap-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
         <div>
-            <div>
+            <span class="section-badge"><i class="bi bi-box-seam me-2"></i>Chi tiết sản phẩm</span>
+            <h2 class="page-title h3 mt-2 mb-0">{{ $product->name }}</h2>
+        </div>
+        <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Quay lại danh sách
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="hero-panel overflow-hidden">
                 @if($product->image)
-                    <img src="{{ asset('storage/' . $product->image) }}" class="detail-image" alt="{{ $product->name }}">
+                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" style="width: 100%; height: 420px; object-fit: cover;">
                 @else
-                    <div class="d-flex align-items-center justify-content-center bg-secondary-subtle" style="height: 360px;">Không có ảnh</div>
+                    <div class="d-flex align-items-center justify-content-center bg-secondary-subtle" style="height: 420px;">Không có ảnh</div>
                 @endif
             </div>
-            <div class="p-4">
+        </div>
+
+        <div class="col-lg-5">
+            <div class="ui-card p-4 h-100">
                 @php($stock = optional($product->inventory)->quantity ?? 0)
-                <h1 class="h3">{{ $product->name }}</h1>
                 <p class="text-muted mb-2">Danh mục: {{ optional($product->category)->name ?? 'Chưa có danh mục' }}</p>
-                <p class="h4 text-success">{{ number_format($product->price, 0, ',', '.') }} VND</p>
-                <p class="mt-3 mb-2">{{ $product->description ?: 'Sản phẩm chưa có mô tả.' }}</p>
+                <p class="h3 fw-bold text-success mb-3">{{ number_format($product->price, 0, ',', '.') }} VND</p>
+                <p class="mb-3">{{ $product->description ?: 'Sản phẩm chưa có mô tả.' }}</p>
                 <p class="mb-3">Tồn kho: <strong>{{ $stock }}</strong></p>
 
                 @if($stock > 0)
-                    <p><span class="badge text-bg-success">Còn hàng</span></p>
+                    <p class="mb-4"><span class="badge text-bg-success">Còn hàng</span></p>
                 @else
-                    <p><span class="badge text-bg-danger">Hết hàng</span></p>
+                    <p class="mb-4"><span class="badge text-bg-danger">Hết hàng</span></p>
                 @endif
 
                 @if(Route::has('cart.add'))
-                    <form action="{{ route('cart.add') }}" method="POST" class="mt-3">
+                    <form action="{{ route('cart.add') }}" method="POST" class="mt-2">
                         @csrf
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
-                        <div class="mb-3" style="max-width: 220px;">
+                        <div class="mb-3" style="max-width: 240px;">
                             <label for="qty" class="form-label mb-1">Số lượng</label>
                             <div class="input-group">
                                 <button type="button" class="btn btn-outline-secondary" onclick="changeQty(-1)">-</button>
@@ -68,7 +54,7 @@
                         <button type="submit" class="btn btn-success" @disabled($stock <= 0)>Thêm vào giỏ</button>
                     </form>
                 @else
-                    <div class="mb-3" style="max-width: 220px;">
+                    <div class="mb-3" style="max-width: 240px;">
                         <label for="qty-disabled" class="form-label mb-1">Số lượng</label>
                         <div class="input-group">
                             <button type="button" class="btn btn-outline-secondary" disabled>-</button>
@@ -82,6 +68,9 @@
         </div>
     </div>
 </div>
+@endsection
+
+@push('scripts')
 <script>
     function changeQty(step) {
         const input = document.getElementById('qty');
@@ -102,5 +91,4 @@
         input.value = next;
     }
 </script>
-</body>
-</html>
+@endpush

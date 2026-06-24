@@ -86,7 +86,7 @@ class CartController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Thêm sản phẩm thành công.');
+        return redirect()->route('products.index')->with('success', 'Thêm sản phẩm thành công.');
     }
 
     /**

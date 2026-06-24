@@ -103,6 +103,7 @@ Route::middleware('auth')->group(function () {
 
         // Admin Products
         Route::resource('products', ProductController::class);
+        Route::post('/products/{product}/stock', [ProductController::class, 'updateStock'])->name('products.stock.update');
 
         // Admin Categories (renamed to admin.categories for consistency)
         Route::resource('categories', CategoryController::class);

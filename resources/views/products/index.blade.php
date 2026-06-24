@@ -1,45 +1,24 @@
-<!doctype html>
-<html lang="vi">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Danh sách sản phẩm</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: #f8fafc;
-        }
+@extends('layouts.app')
 
-        .section-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            background: #fff;
-        }
+@section('title', 'Danh sách sản phẩm')
 
-        .category-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-
-        .category-item input {
-            margin-top: 0;
-        }
-    </style>
-</head>
-<body>
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h3 mb-0">Sản phẩm</h1>
-        <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary btn-sm">Quản lý (Admin)</a>
+@section('content')
+<div class="d-flex flex-column gap-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+        <div>
+            <span class="section-badge"><i class="bi bi-box-seam me-2"></i>Sản phẩm</span>
+            <h2 class="page-title h3 mt-2 mb-0">Khám phá sản phẩm</h2>
+        </div>
     </div>
 
-    <form method="GET" action="{{ route('products.index') }}" class="section-card p-3 mb-4">
+    <form method="GET" action="{{ route('products.index') }}" class="section-card p-3 mb-0" id="filterForm">
         <div class="row g-3 align-items-end">
             <div class="col-md-5">
-                <label for="search" class="form-label mb-1">Search</label>
-                <input id="search" name="search" type="text" class="form-control" value="{{ request('search') }}" placeholder="Tìm tên sản phẩm...">
+                <label for="search" class="form-label mb-1">Tìm kiếm</label>
+                <div class="d-flex gap-2">
+                    <input id="search" name="search" type="text" class="form-control" value="{{ request('search') }}" placeholder="Tìm tên sản phẩm...">
+                    <button class="btn btn-success" type="submit">Tìm</button>
+                </div>
             </div>
             <div class="col-md-4">
                 <label for="sort" class="form-label mb-1">Sắp xếp giá</label>
@@ -49,8 +28,9 @@
                     <option value="price_desc" @selected(request('sort') === 'price_desc')>Cao đến thấp</option>
                 </select>
             </div>
-            <div class="col-md-3 d-grid">
-                <button class="btn btn-success" type="submit">Lọc</button>
+            <div class="col-md-3">
+                <label class="form-label mb-1">&nbsp;</label>
+                <a href="{{ route('products.index') }}" class="btn btn-outline-secondary w-100">Đặt lại</a>
             </div>
         </div>
     </form>
@@ -58,9 +38,9 @@
     <div class="row g-4">
         <aside class="col-lg-3">
             <div class="section-card p-3">
-                <h3 class="h6 mb-3">Categories</h3>
+                <h3 class="h6 mb-3">Danh mục</h3>
 
-                <form method="GET" action="{{ route('products.index') }}">
+                <form method="GET" action="{{ route('products.index') }}" id="categoryForm">
                     <input type="hidden" name="search" value="{{ request('search') }}">
                     <input type="hidden" name="sort" value="{{ request('sort') }}">
 
@@ -75,8 +55,6 @@
                             <span>{{ $category->name }}</span>
                         </label>
                     @endforeach
-
-                    <button type="submit" class="btn btn-outline-success btn-sm mt-2">Áp dụng danh mục</button>
                 </form>
             </div>
         </aside>
@@ -134,5 +112,42 @@
         </section>
     </div>
 </div>
-</body>
-</html>
+@endsection
+
+@push('styles')
+<style>
+    .category-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .category-item input {
+        margin-top: 0;
+    }
+</style>
+@endpush
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const filterForm = document.getElementById('filterForm');
+        const categoryForm = document.getElementById('categoryForm');
+
+        if (filterForm) {
+            filterForm.querySelector('#sort').addEventListener('change', function () {
+                filterForm.submit();
+            });
+        }
+
+        if (categoryForm) {
+            categoryForm.querySelectorAll('input[name="category"]').forEach(function (radio) {
+                radio.addEventListener('change', function () {
+                    categoryForm.submit();
+                });
+            });
+        }
+    });
+</script>
+@endpush

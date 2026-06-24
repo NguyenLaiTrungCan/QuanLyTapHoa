@@ -273,16 +273,34 @@
     <main class="py-4">
         <div class="container">
             @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+                    <div class="toast align-items-center border-0 shadow-lg show" role="alert" aria-live="assertive" aria-atomic="true" style="background: linear-gradient(135deg, #ecfdf3 0%, #dcfce7 100%); color: #166534; border-left: 5px solid #16a34a;">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 fs-5 ms-2">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+                            <div class="toast-body fw-semibold">
+                                {{ session('success') }}
+                            </div>
+                            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
                 </div>
             @endif
 
             @if (session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+                    <div class="toast align-items-center border-0 shadow-lg show" role="alert" aria-live="assertive" aria-atomic="true" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); color: #991b1b; border-left: 5px solid #dc2626;">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 fs-5 ms-2">
+                                <i class="bi bi-exclamation-circle-fill"></i>
+                            </div>
+                            <div class="toast-body fw-semibold">
+                                {{ session('error') }}
+                            </div>
+                            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
                 </div>
             @endif
 
