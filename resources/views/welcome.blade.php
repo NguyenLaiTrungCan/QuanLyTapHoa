@@ -8,7 +8,6 @@
         <div class="col-lg-7">
             <span class="soft-pill mb-3"><i class="bi bi-shop"></i> Cửa hàng tạp hóa</span>
             <h1 class="display-5 fw-bold brand-heading mb-3">Mua nhanh, theo dõi rõ, hàng hóa luôn sẵn sàng</h1>
-            <p class="lead subtle mb-4">Tìm sản phẩm, lọc theo danh mục, thêm vào giỏ và đặt hàng ngay từ dữ liệu đang có trong hệ thống.</p>
             <div class="d-flex flex-wrap gap-2">
                 <a class="btn btn-success btn-lg" href="{{ route('products.index') }}">
                     <i class="bi bi-bag me-1"></i> Xem sản phẩm

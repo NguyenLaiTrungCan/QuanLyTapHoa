@@ -23,11 +23,11 @@
 
 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
     <div>
-        <a href="{{ route('orders.index') }}" class="btn btn-link px-0 mb-2">
+        <a href="{{ route('orders.index') }}" class="btn btn-success mt-3 mb-4 px-4 py-2 rounded-pill shadow-sm">
             <i class="bi bi-arrow-left"></i> Quay lại danh sách đơn hàng
         </a>
         <h1 class="page-title h2 mb-1">Đơn hàng #{{ $order->id }}</h1>
-        <div class="text-muted">Đặt lúc {{ optional($order->created_at)->format('d/m/Y H:i') }}</div>
+        <div class="text-muted">Đặt lúc {{ optional($order->created_at)->timezone('Asia/Ho_Chi_Minh')->format('d/m/Y H:i') }}</div>
     </div>
     <span class="badge fs-6 {{ $statusClasses[$order->status] ?? 'text-bg-secondary' }}">
         {{ $statusLabels[$order->status] ?? $order->status }}
