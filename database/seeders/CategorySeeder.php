@@ -7,9 +7,6 @@ use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $categories = [
@@ -22,8 +19,8 @@ class CategorySeeder extends Seeder
 
         foreach ($categories as $category) {
             Category::updateOrCreate(
-                ['name' => $category['name']],
-                ['description' => $category['description']]
+                ['id' => $category['id']],
+                ['name' => $category['name'], 'description' => $category['description']]
             );
         }
     }

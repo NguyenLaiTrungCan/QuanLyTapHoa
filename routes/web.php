@@ -2,16 +2,61 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ProductController;
+use App\Models\Category;
+use App\Models\Product;
+use Illuminate\Support\Facades\Schema;
+
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
 
-Route::view('/', 'welcome')->name('home');
+Route::get('/', function () {
+    if (! Schema::hasTable('categories') || ! Schema::hasTable('products') || ! Schema::hasTable('inventories')) {
+        return view('welcome', [
+            'categories' => collect(),
+            'latestProducts' => collect(),
+            'bestSellingProducts' => collect(),
+        ]);
+    }
+
+    $categories = Category::withCount('products')
+        ->orderByDesc('products_count')
+        ->orderBy('name')
+        ->limit(6)
+        ->get();
+
+    $latestProducts = Product::with(['category', 'inventory'])
+        ->whereHas('inventory', fn ($query) => $query->where('quantity', '>', 0))
+        ->latest()
+        ->limit(6)
+        ->get();
+
+    $bestSellingProducts = Schema::hasTable('order_items')
+        ? Product::with(['category', 'inventory'])
+            ->withSum('orderItems as total_sold', 'quantity')
+            ->whereHas('inventory', fn ($query) => $query->where('quantity', '>', 0))
+            ->orderByDesc('total_sold')
+            ->latest('products.id')
+            ->limit(4)
+            ->get()
+        : collect();
+
+    if ($bestSellingProducts->every(fn ($product) => (int) $product->total_sold === 0)) {
+        $bestSellingProducts = Product::with(['category', 'inventory'])
+            ->whereHas('inventory', fn ($query) => $query->where('quantity', '>', 0))
+            ->latest()
+            ->limit(4)
+            ->get();
+    }
+
+    return view('welcome', compact('categories', 'latestProducts', 'bestSellingProducts'));
+})->name('home');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
@@ -21,6 +66,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login')->name('login.store');
 });
 
+// Products Public Catalog
+Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
+
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -29,44 +78,45 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
     Route::put('/profile/password', [AuthController::class, 'changePassword'])->name('profile.password');
 
-    Route::prefix('admin/categories')->name('categories.')->group(function () {
-        Route::get('/', [CategoryController::class, 'index'])->name('index');
-        Route::get('/create', [CategoryController::class, 'create'])->name('create');
-        Route::post('/', [CategoryController::class, 'store'])->name('store');
-        Route::get('/{category}/edit', [CategoryController::class, 'edit'])->name('edit');
-        Route::put('/{category}', [CategoryController::class, 'update'])->name('update');
-        Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
-    });
-});
-
-
-
-Route::middleware(['auth'])->group(function () {
-   Route::prefix('inventory')->group(function () {
-        // Hiển thị danh sách kho (GET /inventory)
-        Route::get('/', [InventoryController::class, 'index']);
-        
-        // Hiển thị thông tin chi tiết kho (GET /inventory/{id}/show)
-        Route::get('/{id}/show', [InventoryController::class, 'show']);
-        
-        // Xử lý lưu dữ liệu cập nhật kho (PUT /inventory/{id})
-        Route::put('/{id}', [InventoryController::class, 'update']);
+    // Orders (Customer)
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [OrderController::class, 'index'])->name('index');
+        Route::get('/{order}', [OrderController::class, 'show'])->name('show');
+        Route::post('/{order}/cancel', [OrderController::class, 'cancel'])->name('cancel');
     });
 
-    Route::prefix('cart')->group(function () {
-        // Xem giỏ hàng (GET /cart)
-        Route::get('/', [CartController::class, 'index']);
-        
-        // Thêm sản phẩm vào giỏ (POST /cart/add)
-        Route::post('/add', [CartController::class, 'add']);
-        
-        // Cập nhật số lượng sản phẩm (PUT /cart/update/{id})
-        Route::put('/update/{id}', [CartController::class, 'update']);
-        
-        // Xóa một sản phẩm khỏi giỏ (DELETE /cart/remove/{id})
-        Route::delete('/remove/{id}', [CartController::class, 'remove']);
-        
-        // Xóa toàn bộ giỏ hàng (DELETE /cart/clear)
-        Route::delete('/clear', [CartController::class, 'clear']);
+    // Cart
+    Route::prefix('cart')->name('cart.')->group(function () {
+        Route::get('/', [CartController::class, 'index'])->name('index');
+        Route::post('/add', [CartController::class, 'add'])->name('add');
+        Route::put('/update/{id}', [CartController::class, 'update'])->name('update');
+        Route::delete('/remove/{id}', [CartController::class, 'remove'])->name('remove');
+        Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
+    });
+
+    // Checkout
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+
+    // Admin Group
+    Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
+        // Admin Dashboard
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+
+        // Admin Products
+        Route::resource('products', ProductController::class);
+
+        // Admin Categories (renamed to admin.categories for consistency)
+        Route::resource('categories', CategoryController::class);
+
+        // Admin Inventory
+        Route::prefix('inventory')->name('inventory.')->group(function () {
+            Route::get('/', [InventoryController::class, 'index'])->name('index');
+            Route::get('/{id}/edit', [InventoryController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [InventoryController::class, 'update'])->name('update');
+        });
+
+        // Admin Order status updates
+        Route::put('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
     });
 });

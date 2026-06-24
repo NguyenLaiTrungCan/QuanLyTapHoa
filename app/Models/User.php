@@ -28,6 +28,7 @@ class User extends Authenticatable
         'password',
         'phone',
         'address',
+        'is_admin',
     ];
 
     /**
@@ -54,13 +55,21 @@ class User extends Authenticatable
         ];
     }
 
-    public function carts(): HasMany
-    {
-        return $this->hasMany(Cart::class);
-    }
-
-    public function orders(): HasMany
+    public function orders()
     {
         return $this->hasMany(Order::class);
     }
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
+    }
+    public function isAdmin()
+    {
+        return $this->is_admin === true || $this->is_admin === 1;
+    }
+    public function getPendingOrdersCount()
+    {
+        return $this->orders()->where('status', '!=', 'delivered')->count();
+    }
+
 }

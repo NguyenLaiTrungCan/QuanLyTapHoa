@@ -2,11 +2,12 @@
 
 use App\Http\Controllers\Api\CategoryApiController;
 use App\Http\Controllers\ProductController;
-
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\OrderController;
 
-use Illuminate\Support\Facades\Route;
 
 Route::prefix('categories')->group(function () {
     Route::get('/', [CategoryApiController::class, 'index']);
@@ -20,7 +21,6 @@ Route::prefix('categories')->group(function () {
 });
 
 Route::apiResource('products', ProductController::class)->names('api.products');
-
 
 // MODULE: KHO HÀNG (Dành cho Admin - có thể thêm middleware admin sau)
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -36,4 +36,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/cart/update/{id}', [CartController::class, 'update']); // Cập nhật số lượng
     Route::delete('/cart/remove/{id}', [CartController::class, 'remove']); // Xóa 1 item
     Route::delete('/cart/clear', [CartController::class, 'clear']); // Xóa toàn bộ giỏ
+});
+
+// MODULE: ĐƠN HÀNG & CHECKOUT
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::get('/orders/{order}', [OrderController::class, 'show']);
+    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel']);
+    Route::post('/checkout', [CheckoutController::class, 'store']);
+    Route::put('/orders/{order}/status', [OrderController::class, 'updateStatus'])->middleware('admin');
 });

@@ -13,16 +13,19 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // Create Admin Account
         User::updateOrCreate(
             ['email' => 'admin@taphoa.test'],
             [
-                'name' => 'Admin',
+                'name' => 'Admin User',
                 'phone' => '0900000000',
                 'address' => 'TP. Hồ Chí Minh',
                 'password' => Hash::make('password'),
+                'is_admin' => true,
             ]
         );
 
+        // Create Customer Account for Testing
         User::updateOrCreate(
             ['email' => 'customer@taphoa.test'],
             [
@@ -30,6 +33,7 @@ class UserSeeder extends Seeder
                 'phone' => '0911111111',
                 'address' => 'Hà Nội',
                 'password' => Hash::make('password'),
+                'is_admin' => false,
             ]
         );
     }

@@ -19,10 +19,15 @@ class CartRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'product_id' => 'required|integer|exists:products,id',
+        $rules = [
             'quantity' => 'required|integer|min:1|max:999999',
         ];
+
+        if ($this->isMethod('POST') || $this->routeIs('cart.add') || $this->is('api/cart/add')) {
+            $rules['product_id'] = 'required|integer|exists:products,id';
+        }
+
+        return $rules;
     }
 
     /**

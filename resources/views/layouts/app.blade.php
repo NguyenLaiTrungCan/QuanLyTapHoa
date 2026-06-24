@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    @stack('styles')
     <style>
         :root {
             --brand-primary: #22c55e;
@@ -220,8 +221,8 @@
             </button>
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3 ms-lg-auto w-100">
-                    <form class="nav-search d-flex ms-lg-auto" action="{{ route('home') }}" method="GET">
-                        <input class="form-control form-control-sm" type="search" name="q" value="{{ request('q') }}" placeholder="Tìm kiếm sản phẩm, danh mục...">
+                    <form class="nav-search d-flex ms-lg-auto" action="{{ route('products.index') }}" method="GET">
+                        <input class="form-control form-control-sm" type="search" name="search" value="{{ request('search') }}" placeholder="Tìm kiếm sản phẩm, danh mục...">
                         <button class="btn btn-warning btn-sm ms-2 fw-semibold" type="submit">Tìm</button>
                     </form>
 
@@ -236,6 +237,14 @@
                                 {{ auth()->user()->name }}
                             </button>
                             <ul class="dropdown-menu dropdown-user-menu dropdown-menu-end p-2">
+                                @if (auth()->user()->isAdmin())
+                                    <li><a class="dropdown-item rounded-3" href="{{ route('admin.dashboard.index') }}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+                                    <li><a class="dropdown-item rounded-3" href="{{ route('admin.products.index') }}"><i class="bi bi-box-seam me-2"></i>Products</a></li>
+                                    <li><a class="dropdown-item rounded-3" href="{{ route('admin.categories.index') }}"><i class="bi bi-tags me-2"></i>Categories</a></li>
+                                    <li><a class="dropdown-item rounded-3" href="{{ route('admin.inventory.index') }}"><i class="bi bi-clipboard-data me-2"></i>Inventory</a></li>
+                                    <li><a class="dropdown-item rounded-3" href="{{ route('orders.index') }}"><i class="bi bi-receipt-cutoff me-2"></i>Orders</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                @endif
                                 <li><a class="dropdown-item rounded-3" href="{{ route('profile') }}"><i class="bi bi-person me-2"></i>Profile</a></li>
                                 <li><a class="dropdown-item rounded-3" href="{{ route('profile.edit') }}"><i class="bi bi-pencil-square me-2"></i>Chỉnh sửa hồ sơ</a></li>
                                 @if (Route::has('orders.index'))
@@ -301,5 +310,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+@stack('scripts')
 </body>
 </html>

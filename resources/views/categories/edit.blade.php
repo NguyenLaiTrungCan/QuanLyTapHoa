@@ -13,7 +13,7 @@
             </div>
 
             <div class="p-4 p-lg-5">
-                <form action="{{ route('categories.update', $category) }}" method="POST">
+                <form action="{{ route('admin.categories.update', $category) }}" method="POST">
                     @csrf
                     @method('PUT')
 
@@ -35,7 +35,7 @@
 
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-success btn-lg">Cập nhật</button>
-                        <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary btn-lg">Quay lại</a>
+                        <a href="{{ route('admin.categories.index') }}" class="btn btn-outline-secondary btn-lg">Quay lại</a>
                     </div>
                 </form>
             </div>

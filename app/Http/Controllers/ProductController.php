@@ -28,8 +28,10 @@ class ProductController extends Controller
             $query->orderBy('price');
         } elseif ($sort === 'price_desc') {
             $query->orderByDesc('price');
+        } elseif ($sort === 'id_asc') {
+            $query->orderBy('id');
         } else {
-            $query->latest('id');
+            $query->latest('id'); // id_desc (mặc định)
         }
 
         if ($request->is('api/*')) {
@@ -38,6 +40,10 @@ class ProductController extends Controller
 
         $products = $query->paginate(12)->withQueryString();
         $categories = Category::query()->orderBy('name')->get();
+
+        if ($request->is('admin/*')) {
+            return view('admin.products.index', compact('products', 'categories'));
+        }
 
         return view('products.index', compact('products', 'categories'));
     }
@@ -120,7 +126,7 @@ class ProductController extends Controller
     private function validateProduct(Request $request, ?int $productId = null): array
     {
         return $request->validate([
-            'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')->ignore($productId)],
+            'name' => ['required', 'string', 'max:255', Rule::unique('products', 'name')->ignore($productId, 'id')],
             'price' => ['required', 'integer', 'min:0'],
             'description' => ['nullable', 'string'],
             'category_id' => ['required', 'exists:categories,id'],
