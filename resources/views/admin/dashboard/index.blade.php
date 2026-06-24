@@ -340,7 +340,7 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="order-date">{{ $order->created_at->format('d/m/Y H:i') }}</span>
+                                            <span class="order-date">{{ optional($order->created_at)->timezone('Asia/Ho_Chi_Minh')->format('d/m/Y H:i') }}</span>
                                         </td>
                                         <td class="text-end">
                                             <a href="{{ route('orders.show', $order->id) }}" class="order-action-link">
