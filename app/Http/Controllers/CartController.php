@@ -86,6 +86,26 @@ class CartController extends Controller
             ]);
         }
 
+        $returnTo = $request->input('return_to');
+
+        if ($request->expectsJson() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+            return response()->json([
+                'message' => 'Thêm sản phẩm thành công.',
+                'cart_item' => $cartItem->fresh(),
+            ]);
+        }
+
+        if ($returnTo === 'home') {
+            return redirect()->route('home')->with('success', 'Thêm sản phẩm thành công.');
+        }
+
+        if ($returnTo === 'products.show') {
+            $product = Product::find($productId);
+            if ($product) {
+                return redirect()->route('products.show', $product)->with('success', 'Thêm sản phẩm thành công.');
+            }
+        }
+
         return redirect()->route('products.index')->with('success', 'Thêm sản phẩm thành công.');
     }
 

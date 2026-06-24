@@ -86,10 +86,11 @@
                                     <a class="btn btn-outline-primary btn-sm" href="{{ route('products.show', $product) }}">Chi tiết</a>
 
                                     @if(Route::has('cart.add'))
-                                        <form action="{{ route('cart.add') }}" method="POST">
+                                        <form action="{{ route('cart.add') }}" method="POST" class="cart-add-form">
                                             @csrf
                                             <input type="hidden" name="product_id" value="{{ $product->id }}">
                                             <input type="hidden" name="quantity" value="1">
+                                            <input type="hidden" name="return_to" value="products.index">
                                             <button class="btn btn-success btn-sm" type="submit" @disabled($stock <= 0)>Thêm vào giỏ</button>
                                         </form>
                                     @else

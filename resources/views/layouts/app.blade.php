@@ -324,6 +324,96 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    window.showAppToast = function (message, type = 'success') {
+        const container = document.querySelector('.toast-container') || document.createElement('div');
+        if (!container.classList.contains('toast-container')) {
+            container.className = 'toast-container position-fixed top-0 end-0 p-3';
+            container.style.zIndex = '1080';
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = 'toast align-items-center border-0 shadow-lg show';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+
+        const styles = {
+            success: { background: 'linear-gradient(135deg, #ecfdf3 0%, #dcfce7 100%)', color: '#166534', borderLeft: '5px solid #16a34a' },
+            danger: { background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)', color: '#991b1b', borderLeft: '5px solid #dc2626' }
+        };
+
+        const style = styles[type] || styles.success;
+        Object.assign(toast.style, {
+            background: style.background,
+            color: style.color,
+            borderLeft: style.borderLeft,
+            maxWidth: '320px'
+        });
+
+        const icon = type === 'danger' ? 'bi bi-exclamation-circle-fill' : 'bi bi-check-circle-fill';
+        toast.innerHTML = `
+            <div class="d-flex align-items-center">
+                <div class="flex-shrink-0 fs-5 ms-2"><i class="${icon}"></i></div>
+                <div class="toast-body fw-semibold">${message}</div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.remove();
+        }, 2800);
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('form.cart-add-form').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const submitButton = form.querySelector('button[type="submit"]');
+                if (submitButton) {
+                    submitButton.disabled = true;
+                }
+
+                const formData = new FormData(form);
+                const csrfToken = form.querySelector('input[name="_token"]')?.value || '';
+
+                fetch(form.action, {
+                    method: form.method || 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: formData,
+                })
+                    .then(async function (response) {
+                        const data = await response.json().catch(function () {
+                            return {};
+                        });
+
+                        if (response.ok) {
+                            window.showAppToast(data.message || 'Thêm sản phẩm thành công.', 'success');
+                        } else {
+                            window.showAppToast(data.message || 'Không thể thêm sản phẩm.', 'danger');
+                        }
+                    })
+                    .catch(function () {
+                        window.showAppToast('Không thể thêm sản phẩm. Vui lòng thử lại.', 'danger');
+                    })
+                    .finally(function () {
+                        if (submitButton) {
+                            submitButton.disabled = false;
+                        }
+                    });
+            });
+        });
+    });
+</script>
 @stack('scripts')
 </body>
 </html>

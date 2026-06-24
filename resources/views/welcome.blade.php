@@ -98,10 +98,11 @@
                                 <div class="mt-auto d-grid gap-2">
                                     <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm">Chi tiết</a>
                                     @auth
-                                        <form action="{{ route('cart.add') }}" method="POST">
+                                        <form action="{{ route('cart.add') }}" method="POST" class="cart-add-form">
                                             @csrf
                                             <input type="hidden" name="product_id" value="{{ $product->id }}">
                                             <input type="hidden" name="quantity" value="1">
+                                            <input type="hidden" name="return_to" value="home">
                                             <button type="submit" class="btn btn-success w-100 btn-sm" @disabled($stock <= 0)>Thêm vào giỏ</button>
                                         </form>
                                     @else
