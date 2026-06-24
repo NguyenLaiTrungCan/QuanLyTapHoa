@@ -229,7 +229,7 @@
                     @auth
                         <a class="nav-icon-chip" href="{{ Route::has('cart.index') ? route('cart.index') : '#' }}" @if (! Route::has('cart.index')) aria-disabled="true" tabindex="-1" @endif>
                             <i class="bi bi-cart3"></i>
-                            <span class="badge text-bg-warning text-dark">0</span>
+                            <span class="badge text-bg-warning text-dark"></span>
                         </a>
 
                         <div class="dropdown">
