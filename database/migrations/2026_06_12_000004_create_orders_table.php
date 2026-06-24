@@ -17,6 +17,8 @@ return new class extends Migration
             $table->unsignedBigInteger('total_price')->comment('Tổng tiền tính bằng VNĐ');
             $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'canceled'])->default('pending');
             $table->text('delivery_address');
+            $table->string('phone', 20)->nullable();
+            $table->text('note')->nullable();
             $table->timestamps();
             $table->index('user_id');
             $table->index('status');

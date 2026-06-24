@@ -86,10 +86,12 @@ class CheckoutController extends Controller
 
             // Create Order
             $order = Order::create([
-                'user_id' => $user->id,
-                'total_price' => $total,
-                'status' => 'pending',
+                'user_id'          => $user->id,
+                'total_price'      => $total,
+                'status'           => 'pending',
                 'delivery_address' => $request->input('delivery_address'),
+                'phone'            => $request->input('phone'),
+                'note'             => $request->input('note'),
             ]);
 
             // Create Order Items and update Inventory
