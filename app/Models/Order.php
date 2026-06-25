@@ -35,21 +35,6 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-    public function scopeByStatus($query, $status)
-    {
-        return $query->where('status', $status);
-    }
-
-    public function scopeByUser($query, $userId)
-    {
-        return $query->where('user_id', $userId);
-    }
-
-    public function scopeByRecent($query, $limit = 10)
-    {
-        return $query->orderBy('created_at', 'desc')->limit($limit);
-    }
-
     public function canBeCancelled()
     {
         return $this->status === 'pending';
