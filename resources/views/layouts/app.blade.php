@@ -222,7 +222,7 @@
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3 ms-lg-auto w-100">
                     <form class="nav-search d-flex ms-lg-auto" action="{{ route('products.index') }}" method="GET">
-                        <input class="form-control form-control-sm" type="search" name="search" value="{{ request('search') }}" placeholder="Tìm kiếm sản phẩm, danh mục...">
+                        <input class="form-control form-control-sm" type="search" name="search" value="{{ request('search') }}" placeholder="Tìm kiếm sản phẩm">
                         <button class="btn btn-warning btn-sm ms-2 fw-semibold" type="submit">Tìm</button>
                     </form>
 
